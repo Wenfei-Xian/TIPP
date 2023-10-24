@@ -25,7 +25,7 @@ conda install -c bioconda spoa
 conda install -c bioconda mcl
 conda install -c bioconda samtools
 conda install -c bioconda hifiasm
-conda install -c conda-forge singularity # Until October 24, 2023, the available version of Singularity is 3.8.7. Ensure the version is not lower than 3.8.7.
+conda install -c conda-forge singularity # Until October 24, 2023, the available version of Singularity is 3.8.7. Ensure the version you downloaded is not lower than 3.8.7.
 
 git clone https://github.com/Wenfei-Xian/seqtk.git
 cd seqtk
