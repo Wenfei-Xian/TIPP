@@ -26,12 +26,14 @@ conda install -c bioconda mcl
 conda install -c bioconda samtools
 conda install -c bioconda hifiasm
 conda install -c conda-forge singularity # Until October 24, 2023, the available version of Singularity is 3.8.7. Ensure the version is not lower than 3.8.7.
+
 git clone https://github.com/Wenfei-Xian/seqtk.git
 cd seqtk
 make
 pwd #(you will get the current path)
 export PATH=current_path:$PATH #or you can paste it to your .bashrc, but it will replace the origin seqtk if it's already in your PATH.
 cd ..
+
 git clone https://github.com/Wenfei-Xian/TIPP.git
 cd TIPP
 pwd #(you will get the current path)
