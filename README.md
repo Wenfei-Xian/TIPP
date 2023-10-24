@@ -7,10 +7,10 @@ Diamond https://github.com/bbuchfink/diamond
 Minimap2 https://github.com/lh3/minimap2   
 BCFtools https://github.com/samtools/bcftools   
 SPOA https://github.com/rvaser/spoa    
-mcl https://github.com/micans/mcl   
-samtools https://github.com/samtools/samtools   
-hifiasm https://github.com/chhylp123/hifiasm  
-Above dependencies can be easily intalled by using conda :)   
+MCL https://github.com/micans/mcl   
+Samtools https://github.com/samtools/samtools   
+Hifiasm https://github.com/chhylp123/hifiasm  
+Above dependencies can be easily intalled by using conda, and I believe some of them have already in your path :)   
 seqtk https://github.com/Wenfei-Xian/seqtk (forked from lh3/seqtk)  
 ```
 git clone https://github.com/Wenfei-Xian/seqtk.git
