@@ -28,7 +28,9 @@ conda install -c conda-forge singularity
 git clone https://github.com/Wenfei-Xian/seqtk.git
 cd seqtk
 make
-export PATH=path/seqtk:$PATH
+pwd #(you will get the current path)
+export PATH=current_path:$PATH or you can paste it the your .bashrc, but it will replace the origin seqtk if it's already in your PATH.
+cd ..
 git clone https://github.com/Wenfei-Xian/TIPP.git
 cd TIPP
 singularity pull docker://google/deepvariant:1.5.0
