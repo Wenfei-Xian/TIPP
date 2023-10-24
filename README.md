@@ -34,6 +34,8 @@ export PATH=current_path:$PATH #or you can paste it to your .bashrc, but it will
 cd ..
 git clone https://github.com/Wenfei-Xian/TIPP.git
 cd TIPP
+pwd #(you will get the current path)
+export PATH=current_path:$PATH #paste it to your .bashrc
 BIN_VERSION="1.6.0"
 singularity cache clean # before pull down, I usually clean the cache
 singularity pull docker://google/deepvariant:"${BIN_VERSION}"   
