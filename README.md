@@ -10,7 +10,8 @@ SPOA https://github.com/rvaser/spoa
 MCL https://github.com/micans/mcl   
 Samtools https://github.com/samtools/samtools   
 Hifiasm https://github.com/chhylp123/hifiasm  
-Above dependencies can be easily intalled by using conda, and I believe some of them have already in your path :)   
+Above dependencies can be easily installed using conda, and I believe some of them have already been added to your PATH environment variable :)   
+
 seqtk https://github.com/Wenfei-Xian/seqtk (forked from lh3/seqtk)  
 ```
 git clone https://github.com/Wenfei-Xian/seqtk.git
