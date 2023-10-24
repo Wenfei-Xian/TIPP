@@ -6,8 +6,15 @@ Telomere local assembly, Improved whole genome polish, and Plastid assembly
 Diamond https://github.com/bbuchfink/diamond   
 Minimap2 https://github.com/lh3/minimap2   
 BCFtools https://github.com/samtools/bcftools   
-SPOA https://github.com/rvaser/spoa   
-seqtk https://github.com/Wenfei-Xian/seqtk (forked from lh3/seqtk)   
+SPOA https://github.com/rvaser/spoa    
 mcl https://github.com/micans/mcl   
 samtools https://github.com/samtools/samtools   
-hifiasm https://github.com/chhylp123/hifiasm   
+hifiasm https://github.com/chhylp123/hifiasm  
+Above dependencies can be easily intalled by using conda :)
+seqtk https://github.com/Wenfei-Xian/seqtk (forked from lh3/seqtk)  
+```
+git clone https://github.com/Wenfei-Xian/seqtk.git
+cd seqtk
+make
+export PATH=path/seqtk:$PATH
+```
