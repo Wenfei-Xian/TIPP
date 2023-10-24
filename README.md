@@ -24,7 +24,7 @@ conda install -c bioconda spoa
 conda install -c bioconda mcl
 conda install -c bioconda samtools
 conda install -c bioconda hifiasm
-conda install -c conda-forge singularity
+conda install -c conda-forge singularity #pay attention, singularity should higher than 3.10
 git clone https://github.com/Wenfei-Xian/seqtk.git
 cd seqtk
 make
@@ -34,6 +34,7 @@ cd ..
 git clone https://github.com/Wenfei-Xian/TIPP.git
 cd TIPP
 BIN_VERSION="1.6.0"
+singularity cache clean # before pull down, I usually clean the cache
 singularity pull docker://google/deepvariant:"${BIN_VERSION}"   
 ```
 While there are quite a few dependencies, they are all easy to install, and I believe some of the software in there should be familiar to you :)
