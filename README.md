@@ -17,6 +17,7 @@ Singularity https://github.com/sylabs/singularity
 ```
 conda create -n TIPP
 conda activate TIPP
+conda clean --all # optional
 conda install -c bioconda diamond
 conda install -c bioconda minimap2
 conda install -c bioconda bcftools
