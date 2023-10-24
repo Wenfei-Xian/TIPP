@@ -49,10 +49,16 @@ unless (-d "$contigs.chloroplast") {
         system("mkdir $contigs.chloroplast");
 }
 
-system("minimap2 -x map-hifi -t $threads -c --eqx $contigs $fastq -o $contigs.chloroplast/$contigs.$fastq.paf");
-my$bam_file = "$contigs.chloroplast/$contigs.$fastq.paf";
-my$full_map = "$contigs.chloroplast/$contigs.$fastq.fullmap.ID";
-system("awk '{if(\$3<100 && \$4+100>\$2)print \$1 }' $bam_file | sort | uniq -u > $full_map");
+if( defined $contigs ){
+	system("minimap2 -x map-hifi -t $threads -c --eqx $contigs $fastq -o $contigs.chloroplast/$contigs.$fastq.paf");
+	my$bam_file = "$contigs.chloroplast/$contigs.$fastq.paf";
+	my$full_map = "$contigs.chloroplast/$contigs.$fastq.fullmap.ID";
+	system("awk '{if(\$3<100 && \$4+100>\$2)print \$1 }' $bam_file | sort | uniq -u > $full_map");
+}
+else{
+	my$full_map = "$contigs.chloroplast/$contigs.$fastq.fullmap.ID";
+	system("touch $full_map");
+}
 
 if (-e "$script_dir/coregene.fa" && -e "$script_dir/coregene.fa.dmnd" ) {
 	print "Chloroplast seed found!\n";
