@@ -33,7 +33,8 @@ export PATH=current_path:$PATH #or you can paste it to your .bashrc, but it will
 cd ..
 git clone https://github.com/Wenfei-Xian/TIPP.git
 cd TIPP
-singularity pull docker://google/deepvariant:1.5.0
+BIN_VERSION="1.6.0"
+singularity pull docker://google/deepvariant:"${BIN_VERSION}"   
 ```
 While there are quite a few dependencies, they are all easy to install, and I believe some of the software in there should be familiar to you :)
 
