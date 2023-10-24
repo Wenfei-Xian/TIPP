@@ -36,3 +36,6 @@ cd TIPP
 singularity pull docker://google/deepvariant:1.5.0
 ```
 While there are quite a few dependencies, they are all easy to install, and I believe some of the software in there should be familiar to you :)
+
+## Usage   
+
