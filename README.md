@@ -20,12 +20,13 @@ conda activate TIPP
 conda clean --all # optional
 conda install -c bioconda diamond
 conda install -c bioconda minimap2
-conda install -c bioconda bcftools
 conda install -c bioconda spoa
 conda install -c bioconda mcl
-conda install -c bioconda samtools
 conda install -c bioconda hifiasm
 conda install -c conda-forge singularity # Until October 24, 2023, the available version of Singularity is 3.8.7. Ensure the version you downloaded is not lower than 3.8.7.
+
+#conda install -c bioconda samtools# not recommond via conda
+#conda install -c bioconda bcftools# not recommond via conda
 
 git clone https://github.com/Wenfei-Xian/seqtk.git
 cd seqtk
