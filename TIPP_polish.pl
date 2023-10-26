@@ -24,6 +24,7 @@ GetOptions(
     'f=s' => \$fastq,
     'c=s' => \$contigs,
     'b=s' => \$bam,
+    't=s' => \$threads,
 );
 
 if ($help or not defined $fastq and not defined $contigs) {
@@ -34,6 +35,7 @@ if ($help or not defined $fastq and not defined $contigs) {
     #print "-u: telomere unit.\n";
     print "-f: hifi reads.\n";
     print "-c: contigs.\n";
+    print "-t: threads.\n";
     exit;
 }
 
@@ -55,9 +57,9 @@ unless (-d "$contigs_name.polish") {
 
 if( not defined $bam ){
 	$fastq_name=(split /\//,$fastq)[-1];
-	$bam="$contigs_name.$fastq_name.sorted.bam";
-	system("minimap2 -I 20G -ax map-hifi -t $threads $contigs $fastq | samtools sort -\@12 -T $contigs_name.polish/$contigs_name.$fastq_name.samtoolstmp -o $contigs_name.polish/$bam -");
-	system("samtools index -\@12 $contigs_name.polish/$bam");
+	$bam_name="$contigs_name.$fastq_name.sorted.bam";
+	system("minimap2 -I 20G -ax map-hifi -t $threads $contigs $fastq | samtools sort -\@12 -T $contigs_name.polish/$contigs_name.$fastq_name.samtoolstmp -o $contigs_name.polish/$bam_name -");
+	system("samtools index -\@12 $contigs_name.polish/$bam_name");
 }
 else{
 	$bam_name=(split /\//,$bam)[-1];
@@ -139,7 +141,8 @@ elsif ($variant_retained > 0 && -e $output_file) {
     print "   After filtering, $variant_retained variants were retained :)\n";
 }
 
-my$tlapolish_fa="$contigs.polished.fa";
-
+my$tlapolish_fa="$contigs_name.polished.fa";
+print "bcftools index\n";
 system("bcftools index $output_file");
+print "bcftools consensus\n";
 system("bcftools consensus -o $contigs_name.polish/$tlapolish_fa -f $contigs $output_file");

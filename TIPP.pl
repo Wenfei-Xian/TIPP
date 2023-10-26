@@ -61,7 +61,7 @@ system("seqtk telo -m $unit $fastq -d 1000 > 01.telomere_local_assembly/$fastq_n
 system("grep -A 1 'remove' --no-group-separator 01.telomere_local_assembly/$fastq_name.telo.fa > 01.telomere_local_assembly/$fastq_name.remove.telo.fa");
 system("minimap2 --eqx -c -x ava-pb -t $threads 01.telomere_local_assembly/$fastq_name.remove.telo.fa 01.telomere_local_assembly/$fastq_name.remove.telo.fa -o 01.telomere_local_assembly/$fastq_name.remove.telo.fa.self.paf");
 
-system(q{awk '{ if( $10>$11*0.98 && ( ( ($4-$3)>$2*0.9 && $2>=1000 ) || ( ($9-$8)>$7*0.9 && $7>=1000 ) )  print}' } . "01.telomere_local_assembly/$fastq_name.remove.telo.fa.self.paf | awk '{print \$1\"\\t\"\$6}' > 01.telomere_local_assembly/$fastq_name.remove.telo.fa.self.paf.abc");
+system("awk '{if( \$10>\$11*0.98 && ( (\$4-\$3)>\$2*0.9 && \$2>=1000 ) || (\$9-\$8)>\$7*0.9 && \$7>=1000 )print}' 01.telomere_local_assembly/${fastq_name}.remove.telo.fa.self.paf | awk '{print \$1\"\\t\"\$6}' > 01.telomere_local_assembly/${fastq_name}.remove.telo.fa.self.paf.abc");
 
 system("mcl 01.telomere_local_assembly/$fastq_name.remove.telo.fa.self.paf.abc --abc -o 01.telomere_local_assembly/$fastq_name.remove.telo.fa.self.paf.abc.mcl");
 
