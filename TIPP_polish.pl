@@ -14,6 +14,8 @@ my$vcf_file_name;
 my$current_directory = cwd();
 my$contigs_name;
 my$fastq_name;
+my$bam_name;
+my$threads=48;
 
 GetOptions(
     'h'   => \$help,
@@ -28,7 +30,7 @@ if ($help or not defined $fastq and not defined $contigs) {
     print "Usage: $0\n";
     print "-h: show this help message.\n";
     #print "-d: specify the VCF file from deepvariant.\n";
-    #print "-b: bam file\n";
+    print "-b: bam file\n";
     #print "-u: telomere unit.\n";
     print "-f: hifi reads.\n";
     print "-c: contigs.\n";
@@ -36,7 +38,6 @@ if ($help or not defined $fastq and not defined $contigs) {
 }
 
 $contigs_name=(split /\//,$contigs)[-1];
-$fastq_name=(split /\//,$fastq)[-1];
 
 for my $tool ("minimap2","bgzip", "bcftools","samtools") {
 	my $return_val = system("which $tool > /dev/null 2>&1");
@@ -46,22 +47,31 @@ for my $tool ("minimap2","bgzip", "bcftools","samtools") {
 }
 
 my$script_dir = ($0 =~ m{(.*/)?})[0];
-my$BIN_VERSION = "1.5.0"; 
+my$BIN_VERSION = "1.6.0"; 
 
 unless (-d "$contigs_name.polish") {
         system("mkdir $contigs_name.polish");
 }
 
-system("minimap2 -ax map-hifi -t 48 $contigs $fastq | samtools sort -\@12 -T $contigs_name.polish/$contigs_name.$fastq_name.samtoolstmp -o $contigs_name.polish/$contigs_name.$fastq_name.sorted.bam -");
-system("samtools index -\@12 $contigs_name.polish/$contigs.$fastq_name.sorted.bam");
+if( not defined $bam ){
+	$fastq_name=(split /\//,$fastq)[-1];
+	$bam="$contigs_name.$fastq_name.sorted.bam";
+	system("minimap2 -I 20G -ax map-hifi -t $threads $contigs $fastq | samtools sort -\@12 -T $contigs_name.polish/$contigs_name.$fastq_name.samtoolstmp -o $contigs_name.polish/$bam -");
+	system("samtools index -\@12 $contigs_name.polish/$bam");
+}
+else{
+	$bam_name=(split /\//,$bam)[-1];
+	system("ln -s $current_directory/$bam $contigs_name.polish/$bam_name");
+	system("ln -s $current_directory/$bam.bai $contigs_name.polish/$bam_name.bai");
+}
 
-if (-e "$script_dir/deepvariant_$BIN_VERSION.sif") {
+if (-e "$script_dir\/deepvariant_$BIN_VERSION.sif") {
 	print "Required tools found\n";
 	print "Starting Deepvariant\n";
 	#$vcf_file="$contigs_name.deepvariant.vcf.gz";
 	$vcf_file_name="$contigs_name.deepvariant.vcf.gz";
 	system("samtools faidx $contigs");
-	system("singularity exec -B /usr/lib/locale/:/usr/lib/locale/ $script_dir/deepvariant_$BIN_VERSION.sif /opt/deepvariant/bin/run_deepvariant --model_type PACBIO --ref $contigs --reads $contigs_name.polish/$contigs_name.$fastq_name.sorted.bam --output_vcf $contigs_name.polish/$vcf_file_name --num_shards 40");
+	system("singularity exec -B /usr/lib/locale/:/usr/lib/locale/ $script_dir/deepvariant_$BIN_VERSION.sif /opt/deepvariant/bin/run_deepvariant --model_type PACBIO --ref $contigs --reads $contigs_name.polish/$bam_name --output_vcf $contigs_name.polish/$vcf_file_name --num_shards $threads");
 }
 else{
 	print "The deepvariant singularity container is not found.\n";

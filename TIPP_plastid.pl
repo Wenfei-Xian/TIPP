@@ -50,7 +50,7 @@ unless (-d "$contigs.chloroplast") {
 }
 
 if( defined $contigs ){
-	system("minimap2 -x map-hifi -t $threads -c --eqx $contigs $fastq -o $contigs.chloroplast/$contigs.$fastq.paf");
+	system("minimap2 -x map-hifi -I 20G -t $threads -c --eqx $contigs $fastq -o $contigs.chloroplast/$contigs.$fastq.paf");
 	my$bam_file = "$contigs.chloroplast/$contigs.$fastq.paf";
 	my$full_map = "$contigs.chloroplast/$contigs.$fastq.fullmap.ID";
 	system("awk '{if(\$3<100 && \$4+100>\$2)print \$1 }' $bam_file | sort | uniq -u > $full_map");

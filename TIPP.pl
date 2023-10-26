@@ -49,7 +49,7 @@ $contigs_name=(split /\//,$contigs)[-1];
 $fastq_name=(split /\//,$fastq)[-1];
 
 my$script_dir = ($0 =~ m{(.*/)?})[0];
-my$BIN_VERSION = "1.5.0"; 
+my$BIN_VERSION = "1.6.0"; 
 
 print "Step 1: Extracting telomere reads, classifying into clusters, and generating a consensus for each cluster\n";
 
@@ -61,7 +61,7 @@ system("seqtk telo -m $unit $fastq -d 1000 > 01.telomere_local_assembly/$fastq_n
 system("grep -A 1 'remove' --no-group-separator 01.telomere_local_assembly/$fastq_name.telo.fa > 01.telomere_local_assembly/$fastq_name.remove.telo.fa");
 system("minimap2 --eqx -c -x ava-pb -t $threads 01.telomere_local_assembly/$fastq_name.remove.telo.fa 01.telomere_local_assembly/$fastq_name.remove.telo.fa -o 01.telomere_local_assembly/$fastq_name.remove.telo.fa.self.paf");
 
-system(q{awk '{ if( $10>$11*0.98 && ( ($4-$3)>$2*0.9 || ($9-$8)>$7*0.9 ) )  print}' } . "01.telomere_local_assembly/$fastq_name.remove.telo.fa.self.paf | awk '{print \$1\"\\t\"\$6}' > 01.telomere_local_assembly/$fastq_name.remove.telo.fa.self.paf.abc");
+system(q{awk '{ if( $10>$11*0.98 && ( ( ($4-$3)>$2*0.9 && $2>=1000 ) || ( ($9-$8)>$7*0.9 && $7>=1000 ) )  print}' } . "01.telomere_local_assembly/$fastq_name.remove.telo.fa.self.paf | awk '{print \$1\"\\t\"\$6}' > 01.telomere_local_assembly/$fastq_name.remove.telo.fa.self.paf.abc");
 
 system("mcl 01.telomere_local_assembly/$fastq_name.remove.telo.fa.self.paf.abc --abc -o 01.telomere_local_assembly/$fastq_name.remove.telo.fa.self.paf.abc.mcl");
 
@@ -136,7 +136,7 @@ my$alltelomere="$contigs_name.all.telomere.cons.fa";
 my$alltelomerepaf="$contigs_name.all.telomere.cons.fa.paf";
 system("rm 01.telomere_local_assembly/$contigs_name.all.telomere.cons.fa");
 system("cat 01.telomere_local_assembly/*cons.fa > 01.telomere_local_assembly/$alltelomere");
-system("minimap2 -x asm5 -t $threads -c --eqx $contigs 01.telomere_local_assembly/$alltelomere -o 01.telomere_local_assembly/$alltelomerepaf");
+system("minimap2 -x asm5 -I 20G -t $threads -c --eqx $contigs 01.telomere_local_assembly/$alltelomere -o 01.telomere_local_assembly/$alltelomerepaf");
 
 sub reverse_complement {
         my $sequence = shift;
@@ -260,7 +260,7 @@ unless (-d "02.polish") {
 
 print "Step2. Polishing\n";
 print "Starting alignment\n";
-system("minimap2 -ax map-hifi -t $threads 01.telomere_local_assembly/$tla $fastq | samtools sort -\@12 -T 02.polish/$tla.$fastq_name.samtoolstmp -o 02.polish/$tla.$fastq_name.sorted.bam -");
+system("minimap2 -ax map-hifi -I 20G -t $threads 01.telomere_local_assembly/$tla $fastq | samtools sort -\@12 -T 02.polish/$tla.$fastq_name.samtoolstmp -o 02.polish/$tla.$fastq_name.sorted.bam -");
 system("samtools index -\@12 02.polish/$tla.$fastq_name.sorted.bam");
 
 if (-e "$script_dir/deepvariant_$BIN_VERSION.sif") {
@@ -269,7 +269,7 @@ if (-e "$script_dir/deepvariant_$BIN_VERSION.sif") {
 	$vcf_file="$contigs_name.deepvariant.vcf.gz";
 	$vcf_file_name="$contigs_name.deepvariant.vcf.gz";
 	system("samtools faidx 01.telomere_local_assembly/$tla");
-	system("singularity exec -B /usr/lib/locale/:/usr/lib/locale/ $script_dir/deepvariant_$BIN_VERSION.sif /opt/deepvariant/bin/run_deepvariant --model_type PACBIO --ref 01.telomere_local_assembly/$tla --reads 02.polish/$tla.$fastq.sorted.bam --output_vcf 02.polish/$vcf_file --num_shards $threads");
+	system("singularity exec -B /usr/lib/locale/:/usr/lib/locale/ $script_dir/deepvariant_$BIN_VERSION.sif /opt/deepvariant/bin/run_deepvariant --model_type PACBIO --ref 01.telomere_local_assembly/$tla --reads 02.polish/$tla.$fastq_name.sorted.bam --output_vcf 02.polish/$vcf_file --num_shards $threads");
 }
 else{
 	print "The deepvariant singularity container is not found.\n";
