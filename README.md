@@ -48,3 +48,8 @@ While there are quite a few dependencies, they are all easy to install, and I be
 
 ## Usage   
 conda activate TIPP
+
+
+## Potiential error I meet
+1) /tmp is full   
+2) lower version of singularity
