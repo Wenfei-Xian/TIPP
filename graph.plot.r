@@ -4,7 +4,7 @@ args<-commandArgs(T)
 library(igraph)
 
 # Read the file into a dataframe for edges
-edges_df <- read.table(args[1], header = FALSE, stringsAsFactors = FALSE)
+edges_df <- read.table(args[1], header = FALSE, stringsAsFactors = FALSE, row.names = FALSE)
 colnames(edges_df) <- c("from", "to")
 
 # Read the cluster information
