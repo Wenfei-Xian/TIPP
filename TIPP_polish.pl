@@ -49,6 +49,7 @@ for my $tool ("minimap2","bgzip", "bcftools","samtools") {
 }
 
 my$script_dir = ($0 =~ m{(.*/)?})[0];
+$script_dir =~ s/\/$//;
 my$BIN_VERSION = "1.6.0"; 
 
 unless (-d "$contigs_name.polish") {
@@ -67,7 +68,7 @@ else{
 	system("ln -s $current_directory/$bam.bai $contigs_name.polish/$bam_name.bai");
 }
 
-if (-e "$script_dir\/deepvariant_$BIN_VERSION.sif") {
+if (-e "$script_dir/deepvariant_$BIN_VERSION.sif") {
 	print "Required tools found\n";
 	print "Starting Deepvariant\n";
 	#$vcf_file="$contigs_name.deepvariant.vcf.gz";

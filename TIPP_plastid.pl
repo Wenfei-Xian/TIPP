@@ -8,11 +8,14 @@ my$help;
 my$vcf_file;
 my$unit;
 my$fastq;
+my$fastq_name;
 my$contigs;
+my$contigs_name;
 my$bam;
 my$vcf_file_name;
 my$threads=40;
 my$current_directory = cwd();
+my$reads=2000;
 
 GetOptions(
     'h'   => \$help,
@@ -22,6 +25,7 @@ GetOptions(
     'c=s' => \$contigs,
     'b=s' => \$bam,
     't=s' => \$threads,
+    'n=s' => \$reads,
 );
 
 if ($help or not defined $vcf_file and not defined $unit and not defined $fastq and not defined $contigs and not defined $bam) {
@@ -45,35 +49,39 @@ for my $tool ("minimap2","samtools","diamond","hifiasm","pigz") {
 
 my$script_dir = ($0 =~ m{(.*/)?})[0];
 
-unless (-d "$contigs.chloroplast") {
-        system("mkdir $contigs.chloroplast");
+$contigs_name=(split /\//,$contigs)[-1];
+#$fastq_name=(split /\//,$fastq)[-1];
+
+unless (-d "$contigs_name.chloroplast") {
+        system("mkdir $contigs_name.chloroplast");
 }
 
 if( defined $contigs ){
-	system("minimap2 -x map-hifi -I 20G -t $threads -c --eqx $contigs $fastq -o $contigs.chloroplast/$contigs.$fastq.paf");
-	my$bam_file = "$contigs.chloroplast/$contigs.$fastq.paf";
-	my$full_map = "$contigs.chloroplast/$contigs.$fastq.fullmap.ID";
+	$fastq_name=(split /\//,$fastq)[-1];
+	system("minimap2 -x map-hifi -I 20G -t $threads -c --eqx $contigs $fastq -o $contigs_name.chloroplast/$contigs_name.$fastq_name.paf");
+	my$bam_file = "$contigs_name.chloroplast/$contigs_name.$fastq_name.paf";
+	my$full_map = "$contigs_name.chloroplast/$contigs_name.$fastq_name.fullmap.ID";
 	system("awk '{if(\$3<100 && \$4+100>\$2)print \$1 }' $bam_file | sort | uniq -u > $full_map");
 }
 else{
-	my$full_map = "$contigs.chloroplast/$contigs.$fastq.fullmap.ID";
+	my$full_map = "$contigs_name.chloroplast/$contigs_name.$fastq_name.fullmap.ID";
 	system("touch $full_map");
 }
 
 if (-e "$script_dir/coregene.fa" && -e "$script_dir/coregene.fa.dmnd" ) {
 	print "Chloroplast seed found!\n";
 	print "Diamond search starting!\n";
-	system("diamond blastx --threads $threads --db $script_dir/coregene.fa --query $fastq --max-target-seqs 50 --outfmt 6 qseqid full_qseq --out $contigs.chloroplast/$fastq.chloroplast.diamond.out");
+	system("diamond blastx --threads $threads --db $script_dir/coregene.fa --query $fastq --max-target-seqs 50 --outfmt 6 qseqid full_qseq --out $contigs_name.chloroplast/$fastq_name.chloroplast.diamond.out");
 }
 else{
 	print "Seed does not exist!";
 	exit;
 }
 
-system("pigz $contigs.chloroplast/$fastq.chloroplast.diamond.out");
-system("zcat $contigs.chloroplast/$fastq.chloroplast.diamond.out | awk '{print \$1}' | sort | uniq -c |awk '{if(\$1 >=3) print \$2}' > $contigs.chloroplast/$fastq.chloroplast.candidate.ID");
+system("pigz $contigs_name.chloroplast/$fastq_name.chloroplast.diamond.out");
+system("zcat $contigs_name.chloroplast/$fastq_name.chloroplast.diamond.out | awk '{print \$1}' | sort | uniq -c |awk '{if(\$1 >=3) print \$2}' > $contigs_name.chloroplast/$fastq_name.chloroplast.candidate.ID");
 
-open my$diamond_canID,"$contigs.chloroplast/$fastq.chloroplast.candidate.ID" or die "Can't open $contigs.chloroplast/$fastq.chloroplast.candidate.ID";
+open my$diamond_canID,"$contigs_name.chloroplast/$fastq_name.chloroplast.candidate.ID" or die "Can't open $contigs_name.chloroplast/$fastq_name.chloroplast.candidate.ID";
 my%diamond_canID_hash;
 while(<$diamond_canID>){
 	chomp;
@@ -81,7 +89,7 @@ while(<$diamond_canID>){
 }
 close $diamond_canID;
 
-open my$full_map_ID,"$contigs.chloroplast/$contigs.$fastq.fullmap.ID" or die "Can't open $contigs.chloroplast/$contigs.$fastq.fullmap.ID";
+open my$full_map_ID,"$contigs_name.chloroplast/$contigs_name.$fastq_name.fullmap.ID" or die "Can't open $contigs_name.chloroplast/$contigs_name.$fastq_name.fullmap.ID";
 my%full_map_hash;
 while(<$full_map_ID>){
 	chomp;
@@ -89,8 +97,8 @@ while(<$full_map_ID>){
 }
 close $full_map_ID;
 
-open my $diamond_out, "gunzip -dc $contigs.chloroplast/$fastq.chloroplast.diamond.out.gz|" or die "Can't open $contigs.chloroplast/$fastq.chloroplast.diamond.out.gz";
-open my $chloroplast_out, ">$contigs.chloroplast/$fastq.chloroplast.reads.fasta";
+open my $diamond_out, "gunzip -dc $contigs_name.chloroplast/$fastq_name.chloroplast.diamond.out.gz|" or die "Can't open $contigs_name.chloroplast/$fastq_name.chloroplast.diamond.out.gz";
+open my $chloroplast_out, ">$contigs_name.chloroplast/$fastq_name.chloroplast.reads.fasta";
 my%hash_single;
 while(<$diamond_out>){
 	chomp;
@@ -107,15 +115,15 @@ while(<$diamond_out>){
 close $diamond_out;
 close $chloroplast_out;
 
-open my $chloroplast, ">$contigs.chloroplast/Chloroplast.fa" or die "Cannot open $contigs.chloroplast/Chloroplast.fa: $!\n";
+open my $chloroplast, ">$contigs_name.chloroplast/Chloroplast.fa" or die "Cannot open $contigs_name.chloroplast/Chloroplast.fa: $!\n";
 
 for (my $round=1; $round<50; $round++){
     print "Starting downsampling of chloroplast reads, round$round...\n";
-    system("seqtk sample -s$round $contigs.chloroplast/$fastq.chloroplast.reads.fasta 2000 > $contigs.chloroplast/$fastq.chloroplast.reads.subsample2000.round$round.fasta");
+    system("seqtk sample -s$round $contigs_name.chloroplast/$fastq_name.chloroplast.reads.fasta $reads > $contigs_name.chloroplast/$fastq_name.chloroplast.reads.subsample$reads.round$round.fasta");
 
-    system("hifiasm -D 1000 -o $contigs.chloroplast/$fastq.chloroplast.reads.subsample2000.round$round -t 40 $contigs.chloroplast/$fastq.chloroplast.reads.subsample2000.round$round.fasta");
+    system("hifiasm -D 1000 -o $contigs_name.chloroplast/$fastq_name.chloroplast.reads.subsample$reads.round$round -t 40 $contigs_name.chloroplast/$fastq_name.chloroplast.reads.subsample$reads.round$round.fasta");
 
-    my $result = `grep '^S' $contigs.chloroplast/$fastq.chloroplast.reads.subsample2000.round$round.bp.p_ctg.gfa | grep 'c\\s'`;
+    my $result = `grep '^S' $contigs_name.chloroplast/$fastq_name.chloroplast.reads.subsample$reads.round$round.bp.p_ctg.gfa | grep 'c\\s'`;
 
     if ($result) {
         print "Circular contig found in round$round.\n";

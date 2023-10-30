@@ -15,6 +15,7 @@ my$vcf_file_name;
 my$current_directory = cwd();
 my$contigs_name;
 my$fastq_name;
+my$extend=0;
 
 GetOptions(
     'h'   => \$help,
@@ -24,6 +25,7 @@ GetOptions(
     'c=s' => \$contigs,
     'b=s' => \$bam,
     't=s' => \$threads,
+    'e=s' => \$extend,
 );
 
 if ($help or not defined $vcf_file and not defined $unit and not defined $fastq and not defined $contigs and not defined $bam) {
@@ -33,8 +35,9 @@ if ($help or not defined $vcf_file and not defined $unit and not defined $fastq 
     #print "-b: bam file\n";
     print "-u: telomere unit.\n";
     print "-f: hifi reads.\n";
-    print "-c: contigs.\n";
-    print "-t: threads for minimap2,hifiasm,diamond.\n";
+    print "-e: extend the contigs.\n";
+    print "-c: contigs. if not extention, it will be the output name\n";
+    print "-t: threads for minimap2.\n";
     exit;
 }
 
@@ -59,11 +62,13 @@ unless (-d "$contigs_name.telomere") {
 
 system("seqtk telo -m $unit $fastq -d 1000 > $contigs_name.telomere/$fastq_name.telo.fa");
 system("grep -A 1 'remove' --no-group-separator $contigs_name.telomere/$fastq_name.telo.fa > $contigs_name.telomere/$fastq_name.remove.telo.fa");
-system("minimap2 --eqx -c -x ava-pb -t $threads $contigs_name.telomere/$fastq_name.remove.telo.fa $contigs_name.telomere/$fastq_name.remove.telo.fa -o $contigs_name.telomere/$fastq_name.remove.telo.fa.self.paf");
+system("minimap2 --eqx -c -x ava-pb -X -t $threads $contigs_name.telomere/$fastq_name.remove.telo.fa $contigs_name.telomere/$fastq_name.remove.telo.fa -o $contigs_name.telomere/$fastq_name.remove.telo.fa.self.paf");
 
-system("awk '{if( \$10>\$11*0.98 && ( (\$4-\$3)>\$2*0.9 && \$2>=1000 ) || (\$9-\$8)>\$7*0.9 && \$7>=1000 )print}' 01.telomere_local_assembly/${fastq_name}.remove.telo.fa.self.paf | awk '{print \$1\"\\t\"\$6}' > 01.telomere_local_assembly/${fastq_name}.remove.telo.fa.self.paf.abc");
+#system("awk '{if( \$10>\$11*0.98 && ( (\$4-\$3)>\$2*0.9 && \$2>=1000 ) || (\$9-\$8)>\$7*0.9 && \$7>=1000 )print}' 01.telomere_local_assembly/${fastq_name}.remove.telo.fa.self.paf | awk '{print \$1\"\\t\"\$6}' > 01.telomere_local_assembly/${fastq_name}.remove.telo.fa.self.paf.abc");
+system("awk '{if( ((\$10/\$11)>0.98) && (( (\$4-\$3)>\$2*0.9 && \$2>=1000 ) || ((\$9-\$8)>\$7*0.9 && \$7>=1000)) && (\$1 != \$6) ) print \$1\"\\t\"\$6}' $contigs_name.telomere/${fastq_name}.remove.telo.fa.self.paf | sort | uniq > $contigs_name.telomere/${fastq_name}.remove.telo.fa.self.paf.abc");
 
 system("mcl $contigs_name.telomere/$fastq_name.remove.telo.fa.self.paf.abc --abc -o $contigs_name.telomere/$fastq_name.remove.telo.fa.self.paf.abc.mcl");
+system("Rscript $script_dir/graph.plot.r $contigs_name.telomere/$fastq_name.remove.telo.fa.self.paf.abc $contigs_name.telomere/$fastq_name.remove.telo.fa.self.paf.abc.mcl $contigs_name.telomere/$fastq_name.remove.telo.fa.self.paf.abc.mcl.graph.pdf");
 
 open my$telo,"$contigs_name.telomere/$fastq_name.telo.fa" or die "Can't open $contigs_name.telomere/$fastq_name.telo.fa";
 $/=">";<$telo>;
@@ -132,6 +137,10 @@ else{
 	print "   $telomere telomere regions have been assembled. :)\n";
 }
 
+if( $extend == 0 ){
+	exit;
+}
+
 my$alltelomere="$contigs_name.all.telomere.cons.fa";
 my$alltelomerepaf="$contigs_name.all.telomere.cons.fa.paf";
 system("rm $contigs_name.telomere/$contigs_name.all.telomere.cons.fa");
@@ -185,7 +194,8 @@ while(<$paf_file>){
         my ($q_id, $t_id, $t_start, $t_end, $strand, $mapq,$q_len, $t_len, $matches) = ($fields[0], $fields[5], $fields[7], $fields[8], $fields[4], $fields[11],$fields[1], $fields[6], $fields[9]);
         next unless $mapq == 60; #uniq mapping
         next unless $matches >= $q_len*0.8; #true telomere
-        push @{$hash_paf{$t_id}},"$_";
+        next unless ($t_start < 50000 || $t_end + 50000 > $t_len);
+	push @{$hash_paf{$t_id}},"$_";
 }
 close $paf_file;
 

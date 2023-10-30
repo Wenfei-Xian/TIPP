@@ -15,6 +15,8 @@ my$vcf_file_name;
 my$current_directory = cwd();
 my$contigs_name;
 my$fastq_name;
+my$extend=1;
+my$reads=2000;
 
 GetOptions(
     'h'   => \$help,
@@ -24,6 +26,8 @@ GetOptions(
     'c=s' => \$contigs,
     'b=s' => \$bam,
     't=s' => \$threads,
+    'e=s' => \$extend,
+    'n=s' => \$reads,
 );
 
 if ($help or not defined $vcf_file and not defined $unit and not defined $fastq and not defined $contigs and not defined $bam) {
@@ -35,6 +39,8 @@ if ($help or not defined $vcf_file and not defined $unit and not defined $fastq 
     print "-f: hifi reads.\n";
     print "-c: contigs.\n";
     print "-t: threads for minimap2,hifiasm,diamond.\n";
+    print "-e: extend the telomere in the primary assembly (default:0).\n";
+    print "-n: number of reads will be sumsample (default:2000).\n";
     exit;
 }
 
@@ -49,6 +55,7 @@ $contigs_name=(split /\//,$contigs)[-1];
 $fastq_name=(split /\//,$fastq)[-1];
 
 my$script_dir = ($0 =~ m{(.*/)?})[0];
+$script_dir =~ s/\/$//;
 my$BIN_VERSION = "1.6.0"; 
 
 print "Step 1: Extracting telomere reads, classifying into clusters, and generating a consensus for each cluster\n";
@@ -61,9 +68,11 @@ system("seqtk telo -m $unit $fastq -d 1000 > 01.telomere_local_assembly/$fastq_n
 system("grep -A 1 'remove' --no-group-separator 01.telomere_local_assembly/$fastq_name.telo.fa > 01.telomere_local_assembly/$fastq_name.remove.telo.fa");
 system("minimap2 --eqx -c -x ava-pb -t $threads 01.telomere_local_assembly/$fastq_name.remove.telo.fa 01.telomere_local_assembly/$fastq_name.remove.telo.fa -o 01.telomere_local_assembly/$fastq_name.remove.telo.fa.self.paf");
 
-system("awk '{if( \$10>\$11*0.98 && ( (\$4-\$3)>\$2*0.9 && \$2>=1000 ) || (\$9-\$8)>\$7*0.9 && \$7>=1000 )print}' 01.telomere_local_assembly/${fastq_name}.remove.telo.fa.self.paf | awk '{print \$1\"\\t\"\$6}' > 01.telomere_local_assembly/${fastq_name}.remove.telo.fa.self.paf.abc");
+#system("awk '{if( \$10>\$11*0.98 && ( (\$4-\$3)>\$2*0.9 && \$2>=1000 ) || (\$9-\$8)>\$7*0.9 && \$7>=1000 )print}' 01.telomere_local_assembly/${fastq_name}.remove.telo.fa.self.paf | awk '{print \$1\"\\t\"\$6}' > 01.telomere_local_assembly/${fastq_name}.remove.telo.fa.self.paf.abc");
+system("awk '{if( ((\$10/\$11)>0.98) && (( (\$4-\$3)>\$2*0.9 && \$2>=1000 ) || ((\$9-\$8)>\$7*0.9 && \$7>=1000)) && (\$1 != \$6) ) print \$1\"\\t\"\$6}' 01.telomere_local_assembly/${fastq_name}.remove.telo.fa.self.paf | sort | uniq  > 01.telomere_local_assembly/${fastq_name}.remove.telo.fa.self.paf.abc");
 
 system("mcl 01.telomere_local_assembly/$fastq_name.remove.telo.fa.self.paf.abc --abc -o 01.telomere_local_assembly/$fastq_name.remove.telo.fa.self.paf.abc.mcl");
+system("Rscript $script_dir/graph.plot.r 01.telomere_local_assembly/$fastq_name.remove.telo.fa.self.paf.abc 01.telomere_local_assembly/$fastq_name.remove.telo.fa.self.paf.abc.mcl 01.telomere_local_assembly/$fastq_name.remove.telo.fa.self.paf.abc.mcl.graph.pdf");
 
 open my$telo,"01.telomere_local_assembly/$fastq_name.telo.fa" or die "Can't open 01.telomere_local_assembly/$fastq_name.telo.fa";
 $/=">";<$telo>;
@@ -122,7 +131,7 @@ for (my $j=0; $j<$telomere; $j++) {
 	close $MSA;
 	close $MSA01;
 
-	system("Rscript ${script_dir}MSA.plot.r 01.telomere_local_assembly/$fastq_name.telomere$j.cons.MSA.fa.matrix 01.telomere_local_assembly/$fastq_name.telomere$j.cons.MSA.fa.matrix.pdf");
+	system("Rscript $script_dir/MSA.plot.r 01.telomere_local_assembly/$fastq_name.telomere$j.cons.MSA.fa.matrix 01.telomere_local_assembly/$fastq_name.telomere$j.cons.MSA.fa.matrix.pdf");
 }
 
 if( $telomere == 0 ){
@@ -185,6 +194,7 @@ while(<$paf_file>){
         my ($q_id, $t_id, $t_start, $t_end, $strand, $mapq,$q_len, $t_len, $matches) = ($fields[0], $fields[5], $fields[7], $fields[8], $fields[4], $fields[11],$fields[1], $fields[6], $fields[9]);
         next unless $mapq == 60; #uniq mapping
         next unless $matches >= $q_len*0.8; #true telomere
+	next unless ($t_start < 50000 || $t_end + 50000 > $t_len);
         push @{$hash_paf{$t_id}},"$_";
 }
 close $paf_file;
@@ -238,21 +248,27 @@ foreach my$target (sort keys %hash_paf){
 	}
 }
 
-my$tla="$contigs_name.TLA.fa";
-open my$out,">01.telomere_local_assembly/$tla" or die "Can't open 01.telomere_local_assembly/$tla\n";
-foreach my$ID (sort keys %hash_target){
-	if(exists $hash_target_change{$ID} ){
-		#print "Changed:$ID\n";
-		$hash_target_change{$ID}=~s/\n//g;
-		print $out ">$ID\n$hash_target_change{$ID}\n";
-	}
-	else{
-		#print "No Changed:$ID\n";
-		$hash_target{$ID}=~s/\n//g;
-		print $out ">$ID\n$hash_target{$ID}\n";
+my$tla;
+if( $extend == 1 ){
+	$tla="$contigs_name.TLA.fa";
+	open my$out,">01.telomere_local_assembly/$tla" or die "Can't open 01.telomere_local_assembly/$tla\n";
+	foreach my$ID (sort keys %hash_target){
+		if(exists $hash_target_change{$ID} ){
+			#print "Changed:$ID\n";
+			$hash_target_change{$ID}=~s/\n//g;
+			print $out ">$ID\n$hash_target_change{$ID}\n";
+		}
+		else{
+			#print "No Changed:$ID\n";
+			$hash_target{$ID}=~s/\n//g;
+			print $out ">$ID\n$hash_target{$ID}\n";
+		}
 	}
 }
-
+else{
+	$tla="$contigs_name.noextend.fa";
+	system("ln -s $current_directory/$contigs $current_directory/01.telomere_local_assembly/$tla");
+}
 
 unless (-d "02.polish") {
 	system("mkdir 02.polish");
@@ -439,11 +455,11 @@ open my $chloroplast, ">03.chloroplast/Chloroplast.fa" or die "Cannot open 03.ch
 for (my $round=1; $round<50; $round++){
     print "Starting downsampling of chloroplast reads, round$round...\n";
 
-    system("seqtk sample -s$round 03.chloroplast/$fastq_name.chloroplast.reads.fasta 2000 > 03.chloroplast/$fastq_name.chloroplast.reads.subsample2000.round$round.fasta");
+    system("seqtk sample -s$round 03.chloroplast/$fastq_name.chloroplast.reads.fasta $reads > 03.chloroplast/$fastq_name.chloroplast.reads.subsample$reads.round$round.fasta");
 
-    system("hifiasm -D 1000 -o 03.chloroplast/$fastq_name.chloroplast.reads.subsample2000.round$round -t $threads 03.chloroplast/$fastq_name.chloroplast.reads.subsample2000.round$round.fasta");
+    system("hifiasm -D 1000 -o 03.chloroplast/$fastq_name.chloroplast.reads.subsample$reads.round$round -t $threads 03.chloroplast/$fastq_name.chloroplast.reads.subsample$reads.round$round.fasta");
 
-    my $result = `grep '^S' 03.chloroplast/$fastq_name.chloroplast.reads.subsample2000.round$round.bp.p_ctg.gfa | grep 'c\\s'`;
+    my $result = `grep '^S' 03.chloroplast/$fastq_name.chloroplast.reads.subsample$reads.round$round.bp.p_ctg.gfa | grep 'c\\s'`;
 
     if ($result) {
         print "Circular contig found in round$round.\n";
