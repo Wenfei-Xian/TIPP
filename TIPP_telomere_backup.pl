@@ -4,12 +4,6 @@ use warnings;
 use Cwd;
 use Getopt::Long;
 
-##########
-#Although the Perl language has been abandoned by many bioinformaticians, it remains a good language for pipeline construction.
-#Below, I have added detailed comments, hoping that users unfamiliar with Perl can also understand what each step is doing :)
-#Author: Wenfei Xian
-##########
-
 my$help;
 my$vcf_file;
 my$unit;
@@ -36,10 +30,11 @@ GetOptions(
     'l=s' => \$telomere_length,
 );
 
-###Help message
 if ($help or not defined $vcf_file and not defined $unit and not defined $fastq and not defined $contigs and not defined $bam) {
     print "Usage: $0\n";
     print "-h: show this help message.\n";
+    #print "-d: specify the VCF file from deepvariant.\n";
+    #print "-b: bam file\n";
     print "-u: telomere unit.\n";
     print "-f: hifi reads.\n";
     print "-e: extend the contigs with new assembled telomere sequences.(default=0, no extend)\n";
@@ -49,48 +44,35 @@ if ($help or not defined $vcf_file and not defined $unit and not defined $fastq 
     exit;
 }
 
-###Check dependencies
-for my $tool ("spoa", "seqtk", "minimap2", "mcl", "samtools","trf") {
+for my $tool ("spoa", "seqtk", "minimap2", "mcl", "bgzip", "bcftools","samtools") {
 	my $return_val = system("which $tool > /dev/null 2>&1");
 	if ($return_val != 0) {
 		die "Error: $tool does not seem to be installed or is not in the PATH. Please check.\n";
 	}
 }
 
-###Extract the name of the contig file, ensuring that the generated file path is not confused by the directory structure.
 $contigs_name=(split /\//,$contigs)[-1];
 $fastq_name=(split /\//,$fastq)[-1];
 
-###Determine the path where the script resides to ensure related scripts are found correctly (like the Rscripts). 
 my$script_dir = ($0 =~ m{(.*/)?})[0];
+my$BIN_VERSION = "1.6.0"; 
 
-###Start
 print "Extracting telomere reads, classifying into clusters, and generating a consensus for each cluster\n";
 
-###Create the output directory.
 unless (-d "$contigs_name.telomere") {
         system("mkdir $contigs_name.telomere");
 }
 
-###Use seqtk to extract HiFi reads with telomeres unit.
 system("seqtk telo -m $unit $fastq -d $telomere_length > $contigs_name.telomere/$fastq_name.telo.fa");
-
-###Process the seqtk output to extract and output sequences with telomeres removed.
 system("grep -A 1 'remove' --no-group-separator $contigs_name.telomere/$fastq_name.telo.fa > $contigs_name.telomere/$fastq_name.remove.telo.fa");
-
-###Employ minimap2 to conduct an all-vs-all alignment of sequences with telomeres removed.
 system("minimap2 --eqx -c -x ava-pb -X -t $threads $contigs_name.telomere/$fastq_name.remove.telo.fa $contigs_name.telomere/$fastq_name.remove.telo.fa -o $contigs_name.telomere/$fastq_name.remove.telo.fa.self.paf");
 
-###Extract potential read pairs stemming from the same telomere based on alignment results, treating each read as a node and each pair as an edge, for use as input to the MCL algorithm.
+#system("awk '{if( \$10>\$11*0.98 && ( (\$4-\$3)>\$2*0.9 && \$2>=1000 ) || (\$9-\$8)>\$7*0.9 && \$7>=1000 )print}' 01.telomere_local_assembly/${fastq_name}.remove.telo.fa.self.paf | awk '{print \$1\"\\t\"\$6}' > 01.telomere_local_assembly/${fastq_name}.remove.telo.fa.self.paf.abc");
 system("awk '{if( ((\$10/\$11)>0.98) && (( (\$4-\$3)>\$2*0.9 && \$2>=1000 ) || ((\$9-\$8)>\$7*0.9 && \$7>=1000)) && (\$1 != \$6) ) print \$1\"\\t\"\$6}' $contigs_name.telomere/${fastq_name}.remove.telo.fa.self.paf | sort | uniq > $contigs_name.telomere/${fastq_name}.remove.telo.fa.self.paf.abc");
 
-###Perform clustering analysis using the MCL algorithm.
 system("mcl $contigs_name.telomere/$fastq_name.remove.telo.fa.self.paf.abc --abc -o $contigs_name.telomere/$fastq_name.remove.telo.fa.self.paf.abc.mcl");
-
-###Visualize the clustering results with an R, allowing for manual inspection of the clusters by the user.
 system("Rscript $script_dir/graph.plot.r $contigs_name.telomere/$fastq_name.remove.telo.fa.self.paf.abc $contigs_name.telomere/$fastq_name.remove.telo.fa.self.paf.abc.mcl $contigs_name.telomere/$fastq_name.remove.telo.fa.self.paf.abc.mcl.graph.pdf");
 
-###Use a hash to store the output results from seqtk.
 open my$telo,"$contigs_name.telomere/$fastq_name.telo.fa" or die "Can't open $contigs_name.telomere/$fastq_name.telo.fa";
 $/=">";<$telo>;
 my%hash_seq;
@@ -107,67 +89,25 @@ $/="\n";
 close $telo;
 
 my$telomere=0;
-###Open the MCL clustering results.
 open my$mcl,"$contigs_name.telomere/$fastq_name.remove.telo.fa.self.paf.abc.mcl" or die "Can't open $contigs_name.telomere/$fastq_name.remove.telo.fa.self.paf.abc.mcl";
-###Create spoa command lines
 open my$spoa,">$contigs_name.telomere/$fastq_name.remove.telo.fa.spoa.sh";
 while(<$mcl>){
         chomp;
         open my$cluster,">$contigs_name.telomere/$fastq_name.telomere$telomere.fa";
         my@reads=split /\t/,$_;
         foreach my$read (@reads){
-                $read=~s/_remove//;###obtain the sequences with telomere
+                $read=~s/_remove//;
                 print $cluster ">$read\n$hash_seq{$read}\n";
         }
         print $spoa "spoa -r 2 -s $contigs_name.telomere/$fastq_name.telomere$telomere.fa > $contigs_name.telomere/$fastq_name.telomere$telomere.cons.MSA.fa\n";
 	$telomere++;
 }
 
-###Because SPOA can consume a high amount of memory, therefore only run two instances concurrently:
 system("cat $contigs_name.telomere/$fastq_name.remove.telo.fa.spoa.sh | xargs -I {} -P 2 bash -c {}");
 
-###Using a loop to process each telomere sequences.
 for (my $j=0; $j<$telomere; $j++) {
-
-	###Change the name of consensus sequence.
 	system("grep -A 1 'Consensus' $contigs_name.telomere/$fastq_name.telomere$j.cons.MSA.fa | sed 's/>Consensus/>telomere$j/' | sed 's/-//g' > $contigs_name.telomere/$fastq_name.telomere$j.cons.fa");
 	
-	###For the convenience of later visualization, adjust the telomere sequences to the start of the sequence.
-	open(my$cons_seqtk, "-|", "seqtk telo -m $unit $fastq -d $telomere_length $contigs_name.telomere/$fastq_name.telomere$j.cons.fa | head -n 1") or die $!;
-	while (<$cons_seqtk>) {
-		chomp;
-		my@fields = split;
-
-		if ($fields[1] < $fields[3] / 2) { ###No change needed since the telomere is already at the beginning of the sequence.
-			system("cp $contigs_name.telomere/$fastq_name.telomere$j.cons.fa $contigs_name.telomere/$fastq_name.telomere$j.cons.telomere_start.fa");
-			system("trf $contigs_name.telomere/$fastq_name.telomere$j.cons.telomere_start.fa 2 5 7 80 10 50 2000 -l 10");
-			system("perl ${script_dir}html2repeatbed.pl $contigs_name.telomere/$fastq_name.telomere$j.cons.telomere_start.fa.2.5.7.80.10.50.2000.1.txt.html > $contigs_name.telomere/$fastq_name.telomere$j.cons.telomere_start.fa.2.5.7.80.10.50.2000.1.txt.html.bed");
-		}
-		else{ ###Convert the sequence to its reverse complement.
-			my$filename_cons = "$contigs_name.telomere/$fastq_name.telomere$j.cons.fa";
-			my$out_filename_telomere_start = "$contigs_name.telomere/$fastq_name.telomere$j.cons.telomere_start.fa";
-			open(my$in_cons, '<', $filename_cons) or die "Cannot open $filename_cons: $!";
-			open(my$out_cons_telomere_start, '>', $out_filename_telomere_start) or die "Cannot open $out_filename_telomere_start: $!";
-			while (my$cons_line = <$in_cons>) {
-				chomp($cons_line);
-				if ($cons_line =~ /^>/) {
-					print $out_cons_telomere_start "$cons_line\n";
-				}
-				else {
-					my$revcomp = reverse $cons_line;
-					$revcomp =~ tr/ACGTacgt/TGCAtgca/;
-					print $out_cons_telomere_start "$revcomp\n";
-				}
-			}
-			close($in_cons);
-			close($out_cons_telomere_start);
-			system("$contigs_name.telomere/$fastq_name.telomere$j.cons.telomere_start.fa");
-			system("trf $contigs_name.telomere/$fastq_name.telomere$j.cons.telomere_start.fa 2 5 7 80 10 50 2000 -l 10");
-			system("perl ${script_dir}html2repeatbed.pl $contigs_name.telomere/$fastq_name.telomere$j.cons.telomere_start.fa.2.5.7.80.10.50.2000.1.txt.html > $contigs_name.telomere/$fastq_name.telomere$j.cons.telomere_start.fa.2.5.7.80.10.50.2000.1.txt.html.bed");
-		}
-	}
-	close($cons_seqtk);
-
 	open my$MSA,"$contigs_name.telomere/$fastq_name.telomere$j.cons.MSA.fa" or die "Can't open $contigs_name.telomere/$fastq_name.telomere$j.cons.MSA.fa";
 	open my$MSA01,">$contigs_name.telomere/$fastq_name.telomere$j.cons.MSA.fa.matrix" or die "Can't open $contigs_name.telomere/$fastq_name.telomere$j.cons.MSA.fa.matrix";
 	$/=">";<$MSA>;
@@ -192,10 +132,6 @@ for (my $j=0; $j<$telomere; $j++) {
 
 	system("Rscript ${script_dir}MSA.plot.r $contigs_name.telomere/$fastq_name.telomere$j.cons.MSA.fa.matrix $contigs_name.telomere/$fastq_name.telomere$j.cons.MSA.fa.matrix.pdf");
 }
-
-system("cat $contigs_name.telomere/*bed > $contigs_name.telomere/$fastq_name.telomere.bed");
-system("cat $contigs_name.telomere/*cons.fa > $contigs_name.telomere/$fastq_name.telomere.cons.fa");
-system("Rscript ${script_dir}telomeres.visulization.r $contigs_name.telomere/$fastq_name.telomere.cons.fa $contigs_name.telomere/$fastq_name.telomere.bed $contigs_name.telomere/$fastq_name.telomere.pdf");
 
 if( $telomere == 0 ){
 	print "   Sorry, no telomeres have been assembled. :(\n";
