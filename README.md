@@ -25,6 +25,10 @@ conda install -c bioconda mcl
 conda install -c bioconda hifiasm
 conda install -c bioconda r-pheatmap
 conda install -c conda-forge r-igraph
+conda install -c bioconda bioconductor-biostrings
+conda install -c r r-stringdist
+conda install -c conda-forge statistics
+conda install -c conda-forge r-ggplot2
 
 #conda install -c conda-forge singularity # Until October 24, 2023, the available version of Singularity is 3.8.7. Ensure the version you downloaded is not lower than 3.8.7.
 #conda install -c bioconda samtools# not recommond via conda
