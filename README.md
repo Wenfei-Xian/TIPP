@@ -57,3 +57,4 @@ conda activate TIPP
 ## Errors I met
 1) /tmp is full   
 2) lower version of singularity
+3) when coverage is high, sopa will be killed because of high memery usage, downsample could be a good option to solve it.
