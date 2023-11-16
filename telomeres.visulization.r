@@ -97,6 +97,6 @@ bed_df <- read_bed(bed_file_path)
 # 绘制图形
 plot_data <- plot_sequences(fasta_df, bed_df)
 
-# 输出图形到PDF，文件宽度设为8，高度根据plot_data的height决定
-ggsave(args[3], plot_data$plot, width = 8, height = plot_data$height, units = "in", dpi = 300)
+# 输出图形到PDF，文件宽度设为6.69 = 170mm，高度根据plot_data的height决定
+ggsave(args[3], plot_data$plot, width = 6.69, height = plot_data$height, units = "in", limitsize = FALSE)
 
