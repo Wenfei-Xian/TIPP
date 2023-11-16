@@ -1,5 +1,5 @@
 # TIPP
-Telomere local assembly, Improved whole genome polish, and Plastid assembly
+Telomere local assembly, Improved whole genome polish, and Plastid assembly (TIPP)
 
 ## Dependencies
 Diamond https://github.com/bbuchfink/diamond   
