@@ -12,6 +12,7 @@ Hifiasm https://github.com/chhylp123/hifiasm
 seqtk https://github.com/Wenfei-Xian/seqtk (forked from lh3/seqtk)  
 Deepvariant https://github.com/google/deepvariant   
 Singularity https://github.com/sylabs/singularity   
+TRF https://github.com/Benson-Genomics-Lab/TRF
 
 ## Installation
 ```
@@ -28,6 +29,7 @@ conda install -c conda-forge r-igraph
 conda install -c bioconda bioconductor-biostrings
 conda install -c r r-stringdist
 conda install -c conda-forge r-ggplot2
+conda install -c bioconda trf
 
 #conda install -c conda-forge singularity # Until October 24, 2023, the available version of Singularity is 3.8.7. Ensure the version you downloaded is not lower than 3.8.7.
 #conda install -c bioconda samtools# not recommond via conda
