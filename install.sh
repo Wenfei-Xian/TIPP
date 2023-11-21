@@ -14,7 +14,15 @@ cd "$KMC_DIR"
 git submodule update --init
 make
 
-# Go back to the root project directory
+# Go back to the src directory
+cd ..
+
+# Define variables for directories
+SEQTK_DIR="src/seqtk"
+cd "$SEQTK_DIR"
+make
+
+# Go back to the src directory
 cd ..
 
 # Compile the readskmercount program
