@@ -1,3 +1,6 @@
 [submodule "src/kmc3"]
 	path = src/kmc3
 	url = https://github.com/refresh-bio/KMC
+[submodule "src/seqtk"]
+	path = src/seqtk
+	url = https://github.com/Wenfei-Xian/seqtk
