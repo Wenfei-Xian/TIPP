@@ -1,0 +1,3 @@
+[submodule "kmc3"]
+	path = kmc3
+	url = https://github.com/refresh-bio/KMC
