@@ -44,6 +44,9 @@ pwd #(you will get the current path)
 export PATH=current_path/src:$PATH #paste it to your .bashrc
 ```
 
+## Chloroplast Database for TIPP_plastid   
+https://figshare.com/articles/dataset/Chloroplast_genome_Database_for_TIPP_plastid/24600084   
+
 ## Usage   
 conda activate TIPP
 
