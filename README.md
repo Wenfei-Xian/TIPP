@@ -1,13 +1,14 @@
 # TIPP
 Telomere local assembly, Improved whole genome polish, and Plastid assembly (TIPP)
 
-## Dependencies
-Minimap2 https://github.com/lh3/minimap2   
-BCFtools https://github.com/samtools/bcftools   
+## Dependencies for all
+Minimap2 https://github.com/lh3/minimap2
+
+## Dependencies for TIPP_telo
+BCFtools https://github.com/samtools/bcftools
 SPOA https://github.com/rvaser/spoa    
 MCL https://github.com/micans/mcl   
 Samtools https://github.com/samtools/samtools   
-Hifiasm https://github.com/chhylp123/hifiasm  
 seqtk https://github.com/Wenfei-Xian/seqtk (forked from lh3/seqtk)  
 TRF https://github.com/Benson-Genomics-Lab/TRF
 
@@ -15,17 +16,17 @@ TRF https://github.com/Benson-Genomics-Lab/TRF
 ```
 conda create -n TIPP
 conda activate TIPP
-conda install -c bioconda minimap2
-conda install -c bioconda spoa
-conda install -c bioconda mcl
-conda install -c bioconda r-pheatmap
-conda install -c conda-forge r-igraph
-conda install -c bioconda bioconductor-biostrings
-conda install -c r r-stringdist
-conda install -c conda-forge r-ggplot2
-conda install -c bioconda trf
+conda install -c bioconda minimap2 (TIPP_telo,TIPP_plastid)
+conda install -c bioconda spoa (TIPP_telo)
+conda install -c bioconda mcl (TIPP_telo)
+conda install -c bioconda r-pheatmap (TIPP_telo)
+conda install -c conda-forge r-igraph (TIPP_telo)
+conda install -c bioconda bioconductor-biostrings (TIPP_telo)
+conda install -c r r-stringdist (TIPP_telo)
+conda install -c conda-forge r-ggplot2 (TIPP_telo)
+conda install -c bioconda trf (TIPP_telo)
 
-git clone https://github.com/Wenfei-Xian/seqtk.git
+git clone https://github.com/Wenfei-Xian/seqtk.git (TIPP_telo)
 cd seqtk
 make
 pwd #(you will get the current path)
