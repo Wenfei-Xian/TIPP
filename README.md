@@ -5,19 +5,19 @@ Telomere local assembly, Improved whole genome polish, and Plastid assembly (TIP
 Minimap2 https://github.com/lh3/minimap2
 
 ## Dependencies for TIPP_telo
-BCFtools https://github.com/samtools/bcftools
+BCFtools https://github.com/samtools/bcftools   
 SPOA https://github.com/rvaser/spoa    
 MCL https://github.com/micans/mcl   
 Samtools https://github.com/samtools/samtools   
 seqtk https://github.com/Wenfei-Xian/seqtk (forked from lh3/seqtk)  
-TRF https://github.com/Benson-Genomics-Lab/TRF
+TRF https://github.com/Benson-Genomics-Lab/TRF   
 
 ## Installation
 ```
 conda create -n TIPP
 conda activate TIPP
-conda install -c bioconda minimap2 (TIPP_telo,TIPP_plastid)
-conda install -c bioconda spoa (TIPP_telo)
+conda install -c bioconda minimap2 (TIPP_telo,TIPP_plastid)   
+conda install -c bioconda spoa (TIPP_telo)   
 conda install -c bioconda mcl (TIPP_telo)
 conda install -c bioconda r-pheatmap (TIPP_telo)
 conda install -c conda-forge r-igraph (TIPP_telo)
