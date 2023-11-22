@@ -27,19 +27,11 @@ conda install -c conda-forge r-igraph (TIPP_telo)
 conda install -c bioconda bioconductor-biostrings (TIPP_telo)
 conda install -c r r-stringdist (TIPP_telo)
 conda install -c conda-forge r-ggplot2 (TIPP_telo)
-conda install -c bioconda trf (TIPP_telo)
-
-git clone https://github.com/Wenfei-Xian/seqtk.git (TIPP_telo)
-cd seqtk
-make
-pwd #(you will get the current path)
-export PATH=current_path:$PATH #or you can paste it to your .bashrc, but it will replace the origin seqtk if it's already in your PATH.
-cd ..
-
-
+conda install -c bioconda trf (TIPP_telo)   
 
 git clone https://github.com/Wenfei-Xian/TIPP.git
 cd TIPP
+bash install.sh
 pwd #(you will get the current path)
 export PATH=current_path/src:$PATH #paste it to your .bashrc
 ```
