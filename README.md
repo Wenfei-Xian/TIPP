@@ -32,7 +32,7 @@ conda install -c bioconda trf (TIPP_telo)
 
 git clone https://github.com/Wenfei-Xian/TIPP.git
 cd TIPP
-bash install.sh
+bash install.sh (Compile KMC3, seqtk, and readskmercount)
 pwd #(you will get the current path)
 export PATH=current_path/src:$PATH #paste it to your .bashrc
 ```
