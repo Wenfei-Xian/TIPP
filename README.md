@@ -1,4 +1,4 @@
-# Name of TIPP
+## Name of TIPP
 Upon learning that the Tübingen International PhD Program (TIPP) was no longer enrolling new PhD students, I realized that the three tools I was developing could be combined into a toolkit named Telomere local assembly, Improved whole genome polish, and Plastid assembly (TIPP). This was a fitting tribute to the program. I am profoundly grateful to the TIPP PhD program for providing me the opportunity to embark on my doctoral journey at the Max Planck Institute, and I extend my thanks to my mentor, Detlef Weigel. Although TIPP has concluded, the IMPRS PhD program remains active. Interested individuals can learn more by following this link: https://www.phd.tuebingen.mpg.de/imprs.   
 
 ## Dependency for all
