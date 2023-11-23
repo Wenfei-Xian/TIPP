@@ -1,7 +1,7 @@
 # TIPP
 Telomere local assembly, Improved whole genome polish, and Plastid assembly (TIPP)
 
-## Dependencies for all
+## Dependency for all
 Minimap2 https://github.com/lh3/minimap2
 
 ## Dependencies for TIPP_telo
