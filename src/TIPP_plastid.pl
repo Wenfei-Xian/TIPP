@@ -5,42 +5,57 @@ use Cwd;
 use Getopt::Long;
 
 my$help;
-my$vcf_file;
-my$unit;
 my$fastq;
 my$fastq_name;
-my$contigs;
-my$contigs_name;
-my$bam;
-my$vcf_file_name;
 my$threads=40;
 my$current_directory = cwd();
-my$reads=2000;
+my$reads_num=2000;
+my$db;
+my$round_cutoff=5;
+my$no_IR=0;
+my$platform='pacbio';
+my$organelle='Chloroplast';
+my$cap=60000;
 
 GetOptions(
     'h'   => \$help,
-    'd=s' => \$vcf_file,
-    #'u=s' => \$unit,
     'f=s' => \$fastq,
-    'c=s' => \$contigs,
-    'b=s' => \$bam,
     't=s' => \$threads,
-    'n=s' => \$reads,
+    'n=s' => \$reads_num,
+    'd=s' => \$db,
+    'i=s' => \$no_IR,
+    'm=s' => \$platform,
+    'c=s' => \$cap,
+    'r=s' => \$round_cutoff,
+    'g=s' => \$organelle,
 );
 
-if ($help or not defined $vcf_file and not defined $unit and not defined $fastq and not defined $contigs and not defined $bam) {
-    print "Usage: $0\n";
-    print "-h: show this help message.\n";
-    #print "-d: specify the VCF file from deepvariant.\n";
-    #print "-b: bam file\n";
-    #print "-u: telomere unit.\n";
-    print "-f: hifi reads.\n";
-    print "-c: contigs.\n";
-    print "-t: threads for minimap2,hifiasm,diamond.\n";
+if( $platform ne 'pacbio' && $platform ne 'ont' ){
+        print "Error, only pacbio or ont can be accecpted for -m\n";
+        exit;
+}
+
+if( $organelle ne 'Chloroplast' && $organelle ne 'Mitochondrion' ){
+        print "Error, only Chloroplast or Mitochondrion can be accecpted for -g\n";
+        exit;
+}
+
+if ($help or not defined $fastq or not defined $db) {
+    print "Usage: $0 [options]\n";
+    print "  -h: Show this help message.\n";
+    print "  -d: Chloroplast database (required).\n";
+    print "  -f: HiFi reads (required).\n";
+    print "  -g: Chloroplast or Mitochondrion (default: Chloroplast).\n";
+    print "  -t: Threads for Minimap2, Flye, KMC3 and readskmercount.\n";
+    print "  -n: Number of reads in each downsample, if the read length is short (<=15kb) or the genome size is extremely large, please increase this value (default: 2000).\n";
+    print "  -r: Number of random downsamplings (default: 5).\n";
+    print "  -m: Sequencing platform - either 'pacbio' or 'ont'. Only Q20 reads are accepted (default: pacbio).\n";
+    print "  -i: Assume the presence of the inverted repeats (default: 1).\n";
+    print "  -c: Maximum number of candidate reads used (default: 60000).\n";
     exit;
 }
 
-for my $tool ("minimap2","samtools","diamond","hifiasm","pigz") {
+for my $tool ("minimap2","samtools","flye") {
 	my $return_val = system("which $tool > /dev/null 2>&1");
 	if ($return_val != 0) {
 		die "Error: $tool does not seem to be installed or is not in the PATH. Please check.\n";
@@ -49,87 +64,228 @@ for my $tool ("minimap2","samtools","diamond","hifiasm","pigz") {
 
 my$script_dir = ($0 =~ m{(.*/)?})[0];
 
-$contigs_name=(split /\//,$contigs)[-1];
-#$fastq_name=(split /\//,$fastq)[-1];
+$fastq_name=(split /\//,$fastq)[-1];
+my$fastq_name_reads="$fastq_name.$organelle.reads.fa";
 
-unless (-d "$contigs_name.chloroplast") {
-        system("mkdir $contigs_name.chloroplast");
+unless (-d "$fastq_name.$organelle") {
+        system("mkdir $fastq_name.$organelle");
 }
 
-if( defined $contigs ){
-	$fastq_name=(split /\//,$fastq)[-1];
-	system("minimap2 -x map-hifi -I 20G -t $threads -c --eqx $contigs $fastq -o $contigs_name.chloroplast/$contigs_name.$fastq_name.paf");
-	my$bam_file = "$contigs_name.chloroplast/$contigs_name.$fastq_name.paf";
-	my$full_map = "$contigs_name.chloroplast/$contigs_name.$fastq_name.fullmap.ID";
-	system("awk '{if(\$3<100 && \$4+100>\$2)print \$1 }' $bam_file | sort | uniq -u > $full_map");
-}
-else{
-	my$full_map = "$contigs_name.chloroplast/$contigs_name.$fastq_name.fullmap.ID";
-	system("touch $full_map");
-}
+my%hash_uniq_seq;
+my$number_of_reads=0;
 
-if (-e "$script_dir/coregene.fa" && -e "$script_dir/coregene.fa.dmnd" ) {
-	print "Chloroplast seed found!\n";
-	print "Diamond search starting!\n";
-	system("diamond blastx --threads $threads --db $script_dir/coregene.fa --query $fastq --max-target-seqs 50 --outfmt 6 qseqid full_qseq --out $contigs_name.chloroplast/$fastq_name.chloroplast.diamond.out");
+=header
+if( $platform eq 'pacbio' ){
+	open IN1,"minimap2 --secondary no --sam-hit-only -ax map-hifi -t $threads $db $fastq_name |";
 }
 else{
-	print "Seed does not exist!";
-	exit;
+	open IN1,"minimap2 --secondary no --sam-hit-only -ax map-ont -t $threads $db $fastq_name |";
 }
-
-system("pigz $contigs_name.chloroplast/$fastq_name.chloroplast.diamond.out");
-system("zcat $contigs_name.chloroplast/$fastq_name.chloroplast.diamond.out | awk '{print \$1}' | sort | uniq -c |awk '{if(\$1 >=3) print \$2}' > $contigs_name.chloroplast/$fastq_name.chloroplast.candidate.ID");
-
-open my$diamond_canID,"$contigs_name.chloroplast/$fastq_name.chloroplast.candidate.ID" or die "Can't open $contigs_name.chloroplast/$fastq_name.chloroplast.candidate.ID";
-my%diamond_canID_hash;
-while(<$diamond_canID>){
-	chomp;
-	$diamond_canID_hash{$_}=$_;
-}
-close $diamond_canID;
-
-open my$full_map_ID,"$contigs_name.chloroplast/$contigs_name.$fastq_name.fullmap.ID" or die "Can't open $contigs_name.chloroplast/$contigs_name.$fastq_name.fullmap.ID";
-my%full_map_hash;
-while(<$full_map_ID>){
-	chomp;
-	$full_map_hash{$_}=$_;
-}
-close $full_map_ID;
-
-open my $diamond_out, "gunzip -dc $contigs_name.chloroplast/$fastq_name.chloroplast.diamond.out.gz|" or die "Can't open $contigs_name.chloroplast/$fastq_name.chloroplast.diamond.out.gz";
-open my $chloroplast_out, ">$contigs_name.chloroplast/$fastq_name.chloroplast.reads.fasta";
-my%hash_single;
-while(<$diamond_out>){
-	chomp;
-	if (/(\S+)\s+(\S+)/) {
-		my ($diamond_out_id, $diamond_out_seq) = ($1, $2);
-		if (exists $diamond_canID_hash{$diamond_out_id} && !exists $full_map_hash{$diamond_out_id}) {
-			if( !exists $hash_single{$diamond_out_id} ){
-				print $chloroplast_out ">$diamond_out_id\n$diamond_out_seq\n";
-				$hash_single{$diamond_out_id}=$diamond_out_id;
-			}
+open OUT1,">$fastq_name.$organelle/$fastq_name_reads";
+while(<IN1>){
+        chomp;
+        next if(/^@/);
+        my@sam=split /\t/,$_;
+        next if exists $hash_uniq_seq{$sam[0]};
+        $hash_uniq_seq{$sam[0]} = undef;
+	#my$total_matches = calculate_total_length_of_matches($sam[5]);
+        my$query_len=length$sam[9];
+	#if( $total_matches >= $query_len*0.1 && $sam[2]=~m/$organelle/ ){
+	if( $sam[2]=~m/$organelle/ ){
+		$number_of_reads++;
+                print OUT1 ">$sam[0]\n$sam[9]\n";
+		if( $number_of_reads > $cap ){
+			last;
 		}
 	}
 }
-close $diamond_out;
-close $chloroplast_out;
+=cut
 
-open my $chloroplast, ">$contigs_name.chloroplast/Chloroplast.fa" or die "Cannot open $contigs_name.chloroplast/Chloroplast.fa: $!\n";
+sub calculate_total_length_of_matches {
+    my $cigar = shift;
+    my $total_length = 0;
 
-for (my $round=1; $round<50; $round++){
-    print "Starting downsampling of chloroplast reads, round$round...\n";
-    system("seqtk sample -s$round $contigs_name.chloroplast/$fastq_name.chloroplast.reads.fasta $reads > $contigs_name.chloroplast/$fastq_name.chloroplast.reads.subsample$reads.round$round.fasta");
-
-    system("hifiasm -D 1000 -o $contigs_name.chloroplast/$fastq_name.chloroplast.reads.subsample$reads.round$round -t 40 $contigs_name.chloroplast/$fastq_name.chloroplast.reads.subsample$reads.round$round.fasta");
-
-    my $result = `grep '^S' $contigs_name.chloroplast/$fastq_name.chloroplast.reads.subsample$reads.round$round.bp.p_ctg.gfa | grep 'c\\s'`;
-
-    if ($result) {
-        print "Circular contig found in round$round.\n";
-        my ($ID, $seq) = (split /\t/, $result)[1,2];
-        print $chloroplast ">$ID\n$seq\n";
-        last;
+    while ($cigar =~ /(\d+)M/g) {
+        $total_length += $1;
     }
+
+    return $total_length;
 }
-close $chloroplast;
+
+#system("mkdir $fastq_name.$organelle/$fastq_name_reads.tmp");
+#system("$script_dir/kmc3/bin/kmc -k31 -cs999999 -ci3 -fa $fastq_name.$organelle/$fastq_name_reads $fastq_name.$organelle/$fastq_name_reads $fastq_name.$organelle/$fastq_name_reads.tmp");
+#system("rm -rf $fastq_name.$organelle/$fastq_name_reads.tmp");
+
+
+#if($threads >24 ){
+#	system("$script_dir/readskmercount $fastq_name.$organelle/$fastq_name_reads $fastq_name.$organelle/$fastq_name_reads 24");
+#}
+#else{
+#	system("$script_dir/readskmercount $fastq_name.$organelle/$fastq_name_reads $fastq_name.$organelle/$fastq_name_reads $threads");
+#}
+
+my%hash_assembly_round;
+my$found=0;
+for (my $round=1; $round<=$round_cutoff; $round++){
+
+	#system("seqtk sample -s$round $fastq_name.$organelle/$fastq_name_reads.filter.fa $reads_num > $fastq_name.$organelle/$fastq_name_reads.filter.$reads_num.round$round.fa");
+	
+	if( $platform eq 'pacbio' ){
+		#system("flye --pacbio-hifi $fastq_name.$organelle/$fastq_name_reads.filter.$reads_num.round$round.fa --threads $threads -o $fastq_name.$organelle/$fastq_name_reads.filter.$reads_num.round$round.fa.flye");
+	}
+	else{
+		#system("flye --nano-hq $fastq_name.$organelle/$fastq_name_reads.filter.$reads_num.round$round.fa --threads $threads -o $fastq_name.$organelle/$fastq_name_reads.filter.$reads_num.round$round.fa.flye");
+	}
+
+	if( $organelle eq 'Chloroplast' ){
+		if( $no_IR == 0 ){ # assumed that the chloroplast carries inverted repeats
+	
+			open my$chloro_assem,"$fastq_name.$organelle/$fastq_name_reads.filter.$reads_num.round$round.fa.flye/assembly_graph.gfa" or die "Can't open $fastq_name.$organelle/$fastq_name_reads.filter.$reads_num.round$round.fa.flye/assembly_graph.gfa";
+			my%hash_gfa;
+			my%hash_edge_seq;
+			my%hash_edge;
+			while(<$chloro_assem>){
+				chomp;
+				if($_=~m/^L/){
+					my@linkage=split /\t/,$_;
+					$hash_gfa{$linkage[1]}+=1;
+					$hash_gfa{$linkage[3]}+=1;
+					push @{$hash_edge{$linkage[1]}},$linkage[3];
+					push @{$hash_edge{$linkage[3]}},$linkage[1];
+				}
+				elsif($_=~m/^S/){
+					my@S_edge=split /\t/,$_;
+					$hash_edge_seq{$S_edge[1]}=$S_edge[2];
+				}
+			}
+
+			my $number_edge = keys %hash_gfa;
+
+			###Looking for IR edge
+			my$IR;
+			my$LSC;
+			my$SSC;
+			my$ring=0;
+			foreach my$Edge (sort keys %hash_edge){
+				if( scalar @{$hash_edge{$Edge}} == 4 ){ # IR edge
+					my%hash;
+					foreach my$item (@{$hash_edge{$Edge}}){
+						$hash{$item} = 1;
+					}
+					my@unique_array = keys %hash;
+					if( scalar @unique_array == 2 ){
+						if( scalar @{$hash_edge{$unique_array[0]}} == 2 && scalar @{$hash_edge{$unique_array[1]}} == 2 ){
+							print "Chloroplast genome with inverted repeats found\n";
+							$found=1;
+							$IR=$hash_edge_seq{$Edge};
+							if( length$hash_edge_seq{$unique_array[0]} > length$hash_edge_seq{$unique_array[1]} ){
+								$LSC=$hash_edge_seq{$unique_array[0]};
+								$SSC=$hash_edge_seq{$unique_array[1]};
+							}
+							else{
+								$LSC=$hash_edge_seq{$unique_array[1]};
+								$SSC=$hash_edge_seq{$unique_array[0]};
+							}
+							my$SSC_RC=reverse_complement($SSC);
+							my$IR_R=reverse_complement($IR);
+							open my$heteroplasmy,">$fastq_name.$organelle/$fastq_name_reads.filter.$reads_num.round$round.$Edge.$unique_array[0].$unique_array[1].$organelle.fa" or die "Can't open $fastq_name.$organelle/$fastq_name_reads.filter.$reads_num.round$round.$Edge.$unique_array[0].$unique_array[1].$organelle.fa";
+							print $heteroplasmy ">Heteroplasmy1\n$LSC$IR$SSC$IR_R\n";
+							print $heteroplasmy ">Heteroplasmy2\n$LSC$IR$SSC_RC$IR_R\n";
+							system("ln -s $fastq_name_reads.filter.$reads_num.round$round.fa.flye/assembly_graph.gfa $fastq_name.Chloroplast/$fastq_name_reads.filter.$reads_num.round$round.$organelle.gfa");
+						}
+					}
+					elsif( scalar @unique_array == 1 ){
+						if( keys %hash == 1 && $unique_array[0] eq $Edge ){
+							$ring=1;
+						}
+					}
+
+				}	
+				elsif( scalar @{$hash_edge{$Edge}} == 2 ){
+					my%hash;
+					foreach my$item (@{$hash_edge{$Edge}}){
+						$hash{$item} = 1;
+					}
+					my @unique_keys = keys %hash;
+					if( keys %hash == 1 && $unique_keys[0] eq $Edge ){
+						$ring=1;
+					}	
+				}
+			}
+		
+			if( $found == 1 ){
+				last;
+			}
+			elsif( $found == 0 ){ # No inverted repeats genome found
+				if ($ring == 1) {
+					$hash_assembly_round{$round}=$round;
+					print "Chloroplast genome without inverted repeats found in round$round\n";
+					system("ln -s $fastq_name_reads.filter.$reads_num.round$round.fa.flye/assembly.fasta $fastq_name.Chloroplast/$fastq_name_reads.filter.$reads_num.round$round.$organelle.fa");
+				}
+			}
+		}
+		elsif( $no_IR == 1 ){
+			open my$chloro_assem,"$fastq_name.$organelle/$fastq_name_reads.filter.$reads_num.round$round.fa.flye/assembly_graph.gfa" or die "Can't open $fastq_name.$organelle/$fastq_name_reads.filter.$reads_num.round$round.fa.flye/assembly_graph.gfa";
+			my%hash_gfa;
+			while(<$chloro_assem>){
+				chomp;
+				if($_=~m/^L/){
+					my@linkage=split /\t/,$_;
+					$hash_gfa{$linkage[1]}+=1;
+					$hash_gfa{$linkage[3]}+=1;
+				}
+			}
+	
+			my $number_edge = keys %hash_gfa;
+			if ($number_edge == 1) {
+				if($no_IR == 1){
+					print "Chloroplast genome found\n";
+					system("ln -s $fastq_name.$organelle/$fastq_name_reads.filter.$reads_num.round$round.fa.flye/assembly.fasta $fastq_name.$organelle/$fastq_name_reads.filter.$reads_num.round$round.$organelle.fa");
+					$found=1;
+					last;
+				}
+			}
+		}
+	}
+	else{
+		open my$chloro_assem,"$fastq_name.$organelle/$fastq_name_reads.filter.$reads_num.round$round.fa.flye/assembly_graph.gfa" or die "Can't open $fastq_name.$organelle/$fastq_name_reads.filter.$reads_num.round$round.fa.flye/assembly_graph.gfa";
+		my%hash_gfa;
+		while(<$chloro_assem>){
+			chomp;
+			if($_=~m/^L/){
+				my@linkage=split /\t/,$_;
+				$hash_gfa{$linkage[1]}+=1;
+				$hash_gfa{$linkage[3]}+=1;
+			}
+		}
+		my $number_edge = keys %hash_gfa;
+		if ($number_edge == 1) {
+			print "Mitochondrion genome found\n";
+			system("ln -s $fastq_name.$organelle/$fastq_name_reads.filter.$reads_num.round$round.fa.flye/assembly.fasta $fastq_name.$organelle/$fastq_name_reads.filter.$reads_num.round$round.$organelle.fa");
+			$found=1;
+			last;
+		}
+	}
+}
+
+if( $organelle eq 'Chloroplast' ){
+	if ($found == 0 && keys %hash_assembly_round > 0) {
+		print "After $round_cutoff rounds of downsampling and assembly, we couldn't find an assembly with an inverted repeat, but we found an assembly without an inverted repeat.\n";
+		print "You can find the assembly in round ";
+		foreach my $round_assem (sort keys %hash_assembly_round) {
+			print "$round_assem ";
+		}
+		print "\n";
+	}
+	elsif ($found == 0 && keys %hash_assembly_round == 0) {
+		print "After $round_cutoff rounds of downsampling and assembly, we couldn't find any assembly that meets our expectations.\n";
+		print "You can increase the value of -n and try again :)\n";
+	}
+}
+
+sub reverse_complement {
+    my ($dna) = @_;
+    my $revcomp = reverse($dna);
+    $revcomp =~ tr/ACGTacgt/TGCAtgca/;
+    return $revcomp;
+}
