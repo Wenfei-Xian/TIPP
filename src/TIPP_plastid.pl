@@ -16,6 +16,7 @@ my$no_IR=0;
 my$platform='pacbio';
 my$organelle='Chloroplast';
 my$cap=60000;
+my$percentage=0.3;
 
 GetOptions(
     'h'   => \$help,
@@ -28,6 +29,7 @@ GetOptions(
     'c=s' => \$cap,
     'r=s' => \$round_cutoff,
     'g=s' => \$organelle,
+    'p=s' => \$percentage,
 );
 
 if( $platform ne 'pacbio' && $platform ne 'ont' ){
@@ -52,6 +54,7 @@ if ($help or not defined $fastq or not defined $db) {
     print "  -m: Sequencing platform - either 'pacbio' or 'ont'. Only Q20 reads are accepted (default: pacbio).\n";
     print "  -i: Assume the presence of the inverted repeats (default: 1).\n";
     print "  -c: Maximum number of candidate reads used (default: 60000).\n";
+    print "  -p: The proportion of total number of M in cigar / the length of reads, greater than this value is considered a match (default: 0.3).\n";
     exit;
 }
 
@@ -74,7 +77,6 @@ unless (-d "$fastq_name.$organelle") {
 my%hash_uniq_seq;
 my$number_of_reads=0;
 
-=header
 if( $platform eq 'pacbio' ){
 	open IN1,"minimap2 --secondary no --sam-hit-only -ax map-hifi -t $threads $db $fastq_name |";
 }
@@ -82,24 +84,28 @@ else{
 	open IN1,"minimap2 --secondary no --sam-hit-only -ax map-ont -t $threads $db $fastq_name |";
 }
 open OUT1,">$fastq_name.$organelle/$fastq_name_reads";
+open OUT2,">$fastq_name.$organelle/$fastq_name_reads.sam";
 while(<IN1>){
-        chomp;
-        next if(/^@/);
-        my@sam=split /\t/,$_;
-        next if exists $hash_uniq_seq{$sam[0]};
-        $hash_uniq_seq{$sam[0]} = undef;
-	#my$total_matches = calculate_total_length_of_matches($sam[5]);
-        my$query_len=length$sam[9];
-	#if( $total_matches >= $query_len*0.1 && $sam[2]=~m/$organelle/ ){
-	if( $sam[2]=~m/$organelle/ ){
-		$number_of_reads++;
-                print OUT1 ">$sam[0]\n$sam[9]\n";
-		if( $number_of_reads > $cap ){
-			last;
+	chomp;
+	if(/^@/){
+		print OUT2 "$_\n";
+	}
+	else{
+		my@sam=split /\t/,$_;
+		next if exists $hash_uniq_seq{$sam[0]};
+		$hash_uniq_seq{$sam[0]} = undef;
+		my$total_matches = calculate_total_length_of_matches($sam[5]);
+		my$query_len=length$sam[9];
+		if( $total_matches >= $query_len*$percentage && $sam[2]=~m/$organelle/ ){
+			$number_of_reads++;
+			print OUT1 ">$sam[0]\n$sam[9]\n";
+			print OUT2 "$_\n";
+			if( $number_of_reads > $cap ){
+				last;
+			}
 		}
 	}
 }
-=cut
 
 sub calculate_total_length_of_matches {
     my $cigar = shift;
@@ -112,29 +118,29 @@ sub calculate_total_length_of_matches {
     return $total_length;
 }
 
-#system("mkdir $fastq_name.$organelle/$fastq_name_reads.tmp");
-#system("$script_dir/kmc3/bin/kmc -k31 -cs999999 -ci3 -fa $fastq_name.$organelle/$fastq_name_reads $fastq_name.$organelle/$fastq_name_reads $fastq_name.$organelle/$fastq_name_reads.tmp");
-#system("rm -rf $fastq_name.$organelle/$fastq_name_reads.tmp");
+system("mkdir $fastq_name.$organelle/$fastq_name_reads.tmp");
+system("$script_dir/kmc3/bin/kmc -k31 -cs999999 -ci3 -fa $fastq_name.$organelle/$fastq_name_reads $fastq_name.$organelle/$fastq_name_reads $fastq_name.$organelle/$fastq_name_reads.tmp");
+system("rm -rf $fastq_name.$organelle/$fastq_name_reads.tmp");
 
 
-#if($threads >24 ){
-#	system("$script_dir/readskmercount $fastq_name.$organelle/$fastq_name_reads $fastq_name.$organelle/$fastq_name_reads 24");
-#}
-#else{
-#	system("$script_dir/readskmercount $fastq_name.$organelle/$fastq_name_reads $fastq_name.$organelle/$fastq_name_reads $threads");
-#}
+if($threads >24 ){
+	system("$script_dir/readskmercount $fastq_name.$organelle/$fastq_name_reads $fastq_name.$organelle/$fastq_name_reads 24");
+}
+else{
+	system("$script_dir/readskmercount $fastq_name.$organelle/$fastq_name_reads $fastq_name.$organelle/$fastq_name_reads $threads");
+}
 
 my%hash_assembly_round;
 my$found=0;
 for (my $round=1; $round<=$round_cutoff; $round++){
 
-	#system("seqtk sample -s$round $fastq_name.$organelle/$fastq_name_reads.filter.fa $reads_num > $fastq_name.$organelle/$fastq_name_reads.filter.$reads_num.round$round.fa");
+	system("$script_dir/seqtk/seqtk sample -s$round $fastq_name.$organelle/$fastq_name_reads.filter.fa $reads_num > $fastq_name.$organelle/$fastq_name_reads.filter.$reads_num.round$round.fa");
 	
 	if( $platform eq 'pacbio' ){
-		#system("flye --pacbio-hifi $fastq_name.$organelle/$fastq_name_reads.filter.$reads_num.round$round.fa --threads $threads -o $fastq_name.$organelle/$fastq_name_reads.filter.$reads_num.round$round.fa.flye");
+		system("flye --pacbio-hifi $fastq_name.$organelle/$fastq_name_reads.filter.$reads_num.round$round.fa --threads $threads -o $fastq_name.$organelle/$fastq_name_reads.filter.$reads_num.round$round.fa.flye");
 	}
 	else{
-		#system("flye --nano-hq $fastq_name.$organelle/$fastq_name_reads.filter.$reads_num.round$round.fa --threads $threads -o $fastq_name.$organelle/$fastq_name_reads.filter.$reads_num.round$round.fa.flye");
+		system("flye --nano-hq $fastq_name.$organelle/$fastq_name_reads.filter.$reads_num.round$round.fa --threads $threads -o $fastq_name.$organelle/$fastq_name_reads.filter.$reads_num.round$round.fa.flye");
 	}
 
 	if( $organelle eq 'Chloroplast' ){
