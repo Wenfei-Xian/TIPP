@@ -14,7 +14,7 @@ seqtk https://github.com/Wenfei-Xian/seqtk (forked from lh3/seqtk)
 TRF https://github.com/Benson-Genomics-Lab/TRF   
 
 ## Dependency for TIPP_plastid
-KMC3 https://github.com/refresh-bio/KMC
+KMC3 https://github.com/refresh-bio/KMC   
 Flye https://github.com/fenderglass/Flye
 
 ## Installation
