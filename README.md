@@ -15,20 +15,21 @@ TRF https://github.com/Benson-Genomics-Lab/TRF
 
 ## Dependency for TIPP_plastid
 KMC3 https://github.com/refresh-bio/KMC
+Flye https://github.com/fenderglass/Flye
 
 ## Installation
 ```
 conda create -n TIPP
 conda activate TIPP
-conda install -c bioconda minimap2 (TIPP_telo,TIPP_plastid)
-conda install -c bioconda spoa (TIPP_telo)
-conda install -c bioconda mcl (TIPP_telo)
-conda install -c bioconda r-pheatmap (TIPP_telo)
-conda install -c conda-forge r-igraph (TIPP_telo)
-conda install -c bioconda bioconductor-biostrings (TIPP_telo)
-conda install -c r r-stringdist (TIPP_telo)
-conda install -c conda-forge r-ggplot2 (TIPP_telo)
-conda install -c bioconda trf (TIPP_telo)   
+conda install -c bioconda minimap2 (TIPP_telomere,TIPP_plastid)
+conda install -c bioconda spoa (TIPP_telomere)
+conda install -c bioconda mcl (TIPP_telomere)
+conda install -c bioconda r-pheatmap (TIPP_telomere)
+conda install -c conda-forge r-igraph (TIPP_telomere)
+conda install -c bioconda bioconductor-biostrings (TIPP_telomere)
+conda install -c r r-stringdist (TIPP_telomere)
+conda install -c conda-forge r-ggplot2 (TIPP_telomere)
+conda install -c bioconda trf (TIPP_telomere)   
 
 git clone https://github.com/Wenfei-Xian/TIPP.git
 cd TIPP
@@ -55,6 +56,18 @@ Usage: TIPP_plastid.pl [options]
   -i: Assume the presence of the inverted repeats (default: 1).
   -c: Maximum number of candidate reads used (default: 60000).
   -p: The proportion of total number of M in cigar / the length of reads, greater than this value is considered a match (default: 0.3).
+
+```
+### TIPP_telo   
+```
+Usage: TIPP_telomere.pl
+-h: show this help message.
+-u: telomere unit.
+-f: hifi reads.
+-e: extend the contigs with new assembled telomere sequences.(default=0, no extend)
+-c: contigs. If the extension is not specified, it will be used as the output name.
+-t: threads for minimap2.
+-m: minimum length of uniq sequence (without telomere)
 
 ```
 
