@@ -5,7 +5,7 @@ Although the TIPP program has ceased, the IMPRS PhD program continues! Those int
 ## Dependency for all
 Minimap2 https://github.com/lh3/minimap2
 
-## Dependencies for TIPP_telo
+## Dependencies for TIPP_telomere
 BCFtools https://github.com/samtools/bcftools   
 SPOA https://github.com/rvaser/spoa    
 MCL https://github.com/micans/mcl   
