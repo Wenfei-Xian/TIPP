@@ -58,7 +58,7 @@ Usage: TIPP_plastid.pl [options]
   -p: The proportion of total number of M in cigar / the length of reads, greater than this value is considered a match (default: 0.3).
 
 ```
-### TIPP_telo   
+### TIPP_telomere   
 ```
 Usage: TIPP_telomere.pl
 -h: show this help message.
