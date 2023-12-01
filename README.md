@@ -41,8 +41,22 @@ export PATH=current_path/src:$PATH #paste it to your .bashrc
 https://figshare.com/articles/dataset/Chloroplast_genome_Database_for_TIPP_plastid/24600084   
 
 ## Usage   
-conda activate TIPP
+### TIPP_plastid   
+```
+Usage: TIPP_plastid.pl [options]
+  -h: Show this help message.
+  -d: Chloroplast database (required).
+  -f: HiFi reads (required).
+  -g: Chloroplast or Mitochondrion (default: Chloroplast).
+  -t: Threads for Minimap2, Flye, KMC3 and readskmercount.
+  -n: Number of reads in each downsample, if the read length is short (<=15kb) or the genome size is extremely large, please increase this value (default: 2000).
+  -r: Number of random downsamplings (default: 5).
+  -m: Sequencing platform - either 'pacbio' or 'ont'. Only Q20 reads are accepted (default: pacbio).
+  -i: Assume the presence of the inverted repeats (default: 1).
+  -c: Maximum number of candidate reads used (default: 60000).
+  -p: The proportion of total number of M in cigar / the length of reads, greater than this value is considered a match (default: 0.3).
 
+```
 
 ## Errors I met
 1) /tmp is full   
