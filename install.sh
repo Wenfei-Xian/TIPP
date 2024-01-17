@@ -15,7 +15,7 @@ git submodule update --init
 make
 
 # Go back to the src directory
-cd ..
+cd ../..
 
 # Define variables for directories
 SEQTK_DIR="src/seqtk"
