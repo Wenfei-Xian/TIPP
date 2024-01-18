@@ -38,10 +38,13 @@ pwd #(you will get the current path)
 export PATH=current_path/src:$PATH #paste it to your .bashrc
 ```
 
-## Chloroplast Database for TIPP_plastid   
+## Chloroplast and Mitochondrial Database for TIPP_plastid   
 ```
 wget https://figshare.com/ndownloader/files/44102183 -O Plant_chlo_mito.fa.gz
 ```
+or visit
+https://figshare.com/articles/dataset/Plant_Chloroplast_and_Mitochondrial_Genomes/25018469   
+
 
 ## Usage   
 ### TIPP_plastid   
