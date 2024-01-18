@@ -34,8 +34,10 @@ conda install -c bioconda trf (TIPP_telomere)
 git clone https://github.com/Wenfei-Xian/TIPP.git
 cd TIPP
 bash install.sh (Compile KMC3, seqtk, and readskmercount)
-pwd #(you will get the current path)
-export PATH=current_path/src:$PATH #paste it to your .bashrc
+CURRENT_PATH=$(pwd)/src
+echo "export PATH=$CURRENT_PATH:\$PATH" >> ~/.bashrc
+echo "export PATH=$CURRENT_PATH/seqtk:\$PATH" >> ~/.bashrc
+echo "export PATH=$CURRENT_PATH/kmc3/bin:\$PATH" >> ~/.bashrc
 ```
 
 ## Chloroplast and Mitochondrial Database for TIPP_plastid   
