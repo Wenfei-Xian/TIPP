@@ -39,7 +39,9 @@ export PATH=current_path/src:$PATH #paste it to your .bashrc
 ```
 
 ## Chloroplast Database for TIPP_plastid   
-https://figshare.com/articles/dataset/Chloroplast_genome_Database_for_TIPP_plastid/24600084   
+```
+wget https://figshare.com/ndownloader/files/44102183 -O Plant_chlo_mito.fa.gz
+```
 
 ## Usage   
 ### TIPP_plastid   
