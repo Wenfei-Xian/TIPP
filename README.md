@@ -83,3 +83,4 @@ Usage: TIPP_telomere.pl
 2) lower version of singularity
 3) when coverage is high, sopa will be killed because of high memery usage, downsample could be a good option to solve it.
 4) storage is full.
+5) g++: error: unrecognized command line option '-std=c++14', please update the gcc
