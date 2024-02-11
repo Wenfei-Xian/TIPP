@@ -46,7 +46,7 @@ if ($help or not defined $vcf_file and not defined $unit and not defined $fastq 
     print "-u: telomere unit.\n";
     print "-f: hifi reads.\n";
     print "-e: extend the contigs with new assembled telomere sequences.(default=0, no extend)\n";
-    print "-c: contigs. If the extension is not specified, it will be used as the output name.\n";
+    print "-c: contigs. If the extension is not specified, it will be used as the output name.(default=TIPP_telo)\n";
     print "-t: threads for minimap2.\n";
     print "-m: minimum length of uniq sequence (without telomere)\n";
     exit;
@@ -61,7 +61,12 @@ for my $tool ("spoa", "seqtk", "minimap2", "mcl", "samtools","trf") {
 }
 
 ###Extract the name of the contig file, ensuring that the generated file path is not confused by the directory structure.
-$contigs_name=(split /\//,$contigs)[-1];
+if( defined $contigs ){
+	$contigs_name=(split /\//,$contigs)[-1];
+}
+else{
+	$contigs_name="TIPP_telo";
+}
 $fastq_name=(split /\//,$fastq)[-1];
 
 ###Determine the path where the script resides to ensure related scripts are found correctly (like the Rscripts). 
@@ -95,14 +100,37 @@ system("minimap2 --eqx -c -x asm20 -X -t $threads $contigs_name.telomere/$fastq_
 ###Extract potential read pairs stemming from the same telomere based on alignment results, treating each read as a node and each pair as an edge, for use as input to the MCL algorithm.
 open my$paf,"$contigs_name.telomere/$fastq_name.remove.telo.fa.self.paf" or die "Can't open $contigs_name.telomere/$fastq_name.remove.telo.fa.self.paf\n";
 open my$abc,">$contigs_name.telomere/${fastq_name}.remove.telo.fa.self.paf.abc" or die "Can't open $contigs_name.telomere/${fastq_name}.remove.telo.fa.self.paf.abc\n";
+###In theory, if the two hifi reads origin from the same locus, we should detect more Indels, instead of more mismatches.
 my%paf_unit;
 my%paf_pair;
 while(<$paf>){
 	chomp;
 	my@array=split /\t/,$_;
+	my$num_I=0;
+	my$num_D=0;
+	my$num_X=0;
+
+	foreach my$col (@array){
+		if($col=~m/cg:/){
+			while ($col =~ /(\d+)([IDX])/g) {
+				my $count = $1;
+				my $type = $2;
+				if ($type eq 'I') {
+					$num_I+=$count;
+				}
+				elsif ($type eq 'D') {
+					$num_D+=$count;
+				}
+				elsif ($type eq 'X') {
+					$num_X+=$count;
+				}
+			}
+		}
+	}
+
 	if( !exists $paf_pair{"$array[0]\t$array[5]"} ){
 		$paf_pair{"$array[0]\t$array[5]"}=0;
-		if( $array[9]/$array[10] > 0.98  && $array[1] >= $minimum_uniq && $array[6] >= $minimum_uniq && $array[0] ne $array[5] ){
+		if( $array[9]/$array[10] > 0.98  && $array[1] >= $minimum_uniq && $array[6] >= $minimum_uniq && $array[0] ne $array[5] && $num_X < ($num_I+$num_D) ){
 			#MMMMMMMXMMMMMMMMMMMMMMMMM Q20
 			#MMMMMMMMMMMMXMMMMMMMMMMMM Q20
 			#0.99 * 0.99 = 0.98
