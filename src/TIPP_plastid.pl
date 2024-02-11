@@ -45,7 +45,7 @@ if( $organelle ne 'Chloroplast' && $organelle ne 'Mitochondrion' ){
 if ($help or not defined $fastq or not defined $db) {
     print "Usage: $0 [options]\n";
     print "  -h: Show this help message.\n";
-    print "  -d: Chloroplast database (required).\n";
+    print "  -d: Chloroplast-Mitochondrion database (required).\n";
     print "  -f: HiFi reads (required).\n";
     print "  -g: Chloroplast or Mitochondrion (default: Chloroplast).\n";
     print "  -t: Threads for Minimap2, Flye, KMC3 and readskmercount.\n";
