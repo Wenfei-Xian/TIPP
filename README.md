@@ -90,4 +90,4 @@ Citation for TIPP_plastid: https://www.biorxiv.org/content/10.1101/2024.01.29.57
 Please cite the dependencies if you use TIPP_plastid:   
 Flye: https://www.nature.com/articles/s41587-019-0072-8   
 KMC: https://academic.oup.com/bioinformatics/article/33/17/2759/3796399   
-Minimap2: https://github.com/lh3/minimap2   
+Minimap2: https://academic.oup.com/bioinformatics/article/34/18/3094/4994778    
