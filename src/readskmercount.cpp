@@ -95,7 +95,8 @@ void analyzeTmpFile(const std::string& tmpFilename, double fileMedian) {
         }
 
         double lowPercent = 100.0 * lowCount / totalCount;
-        if (lowPercent < 10.0) { //potiential sequencing error
+        //if (lowPercent < 10.0) { //potiential sequencing error
+        if (lowPercent < 20.0 && lowPercent >1.0 ) { //potiential sequencing error, sequencing error should below 1%
             validSeqIDs_mtx.lock();
             validSeqIDs.insert(seqID);
             validSeqIDs_mtx.unlock();
