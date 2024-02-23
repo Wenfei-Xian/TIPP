@@ -84,6 +84,7 @@ Usage: TIPP_telomere.pl
 3) when coverage is high, sopa will be killed because of high memery usage, downsample could be a good option to solve it.
 4) storage is full.
 5) g++: error: unrecognized command line option '-std=c++14', please update the gcc - conda install gcc_linux-64 (KMC3)
+6) plase use seqtk https://github.com/Wenfei-Xian/seqtk (forked from lh3/seqtk) 
 
 ## Citation
 Citation for TIPP_plastid: https://www.biorxiv.org/content/10.1101/2024.01.29.577798v1
