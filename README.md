@@ -16,11 +16,13 @@ TRF https://github.com/Benson-Genomics-Lab/TRF
 ## Dependency for TIPP_plastid
 KMC3 https://github.com/refresh-bio/KMC   
 Flye https://github.com/fenderglass/Flye
+Diamond https://github.com/bbuchfink/diamond
 
 ## Installation
 ```
 conda create -n TIPP
 conda activate TIPP
+conda install -c bioconda diamond (TIPP_plastid)
 conda install -c bioconda minimap2 (TIPP_telomere,TIPP_plastid)
 conda install -c bioconda spoa (TIPP_telomere)
 conda install -c bioconda mcl (TIPP_telomere)
@@ -55,14 +57,15 @@ Usage: TIPP_plastid.pl [options]
   -h: Show this help message.
   -d: Chloroplast database (required).
   -f: HiFi reads (required).
-  -g: Chloroplast or Mitochondrion (default: Chloroplast).
-  -t: Threads for Minimap2, Flye, KMC3 and readskmercount.
-  -n: Number of reads in each downsample, if the read length is short (<=15kb) or the genome size is extremely large, please increase this value (default: 2000).
+  -g: chloroplast or both (default: both).
+  -t: Threads for Minimap2, Flye, KMC3, Diamond and readskmercount.
+  -n: Number of reads in each downsample, if the read length is short (<=15kb) or the genome size is extremely large, please increase this value (default: 2000 for chlo; mito will be 2*n).
   -r: Number of random downsamplings (default: 5).
   -m: Sequencing platform - either 'pacbio' or 'ont'. Only Q20 reads are accepted (default: pacbio).
   -i: Assume the presence of the inverted repeats (default: 1).
   -c: Maximum number of candidate reads used (default: 60000).
-  -p: The proportion of total number of M in cigar / the length of reads, greater than this value is considered a match (default: 0.3).
+  -p: The proportion of total number of M in cigar / the length of reads, greater than this value is considered a match (default: 0.05, mito will be 2*p).
+  -v: version.
 
 ```
 ### TIPP_telomere   
@@ -93,3 +96,4 @@ Citation for TIPP_plastid: https://www.biorxiv.org/content/10.1101/2024.01.29.57
 Flye: https://www.nature.com/articles/s41587-019-0072-8   
 KMC: https://academic.oup.com/bioinformatics/article/33/17/2759/3796399   
 Minimap2: https://academic.oup.com/bioinformatics/article/34/18/3094/4994778    
+Diamond: https://www.nature.com/articles/s41592-021-01101-x
