@@ -17,6 +17,7 @@ TRF https://github.com/Benson-Genomics-Lab/TRF
 KMC3 https://github.com/refresh-bio/KMC   
 Flye https://github.com/fenderglass/Flye
 Diamond https://github.com/bbuchfink/diamond
+Graphaligner https://github.com/maickrau/GraphAligner   
 
 ## Installation
 ```
@@ -97,3 +98,4 @@ Flye: https://www.nature.com/articles/s41587-019-0072-8
 KMC: https://academic.oup.com/bioinformatics/article/33/17/2759/3796399   
 Minimap2: https://academic.oup.com/bioinformatics/article/34/18/3094/4994778    
 Diamond: https://www.nature.com/articles/s41592-021-01101-x
+Graphaligner: https://genomebiology.biomedcentral.com/articles/10.1186/s13059-020-02157-2
