@@ -18,6 +18,19 @@ std::vector<double> medians;
 std::set<std::string> validSeqIDs;
 std::ofstream tmpFile;
 
+std::string reverseComplement(const std::string& kmer) {
+    std::string rc(kmer.size(), ' ');
+    for (size_t i = 0; i < kmer.size(); ++i) {
+        switch (kmer[i]) {
+            case 'A': rc[kmer.size() - 1 - i] = 'T'; break;
+            case 'T': rc[kmer.size() - 1 - i] = 'A'; break;
+            case 'G': rc[kmer.size() - 1 - i] = 'C'; break;
+            case 'C': rc[kmer.size() - 1 - i] = 'G'; break;
+        }
+    }
+    return rc;
+}
+
 void processRead(const std::string& kmcDatabase, const std::string& read, const std::string& seqID) {
     CKMCFile kmcDb;
     if (!kmcDb.OpenForRA(kmcDatabase)) {
@@ -33,8 +46,15 @@ void processRead(const std::string& kmcDatabase, const std::string& read, const 
         std::string kmerStr = read.substr(i, kmerLength);
         kmer.from_string(kmerStr.c_str());
         uint32_t count;
-        if (kmcDb.CheckKmer(kmer, count)) {
+        if (kmcDb.CheckKmer(kmer, count)) { //canonical
             counts.push_back(count);
+        }
+	else{
+	    std::string rcStr = reverseComplement(kmerStr);
+	    kmer.from_string(rcStr.c_str());
+	    if (kmcDb.CheckKmer(kmer, count)) {
+		    counts.push_back(count);
+            }
         }
     }
 
@@ -89,14 +109,14 @@ void analyzeTmpFile(const std::string& tmpFilename, double fileMedian) {
         iss >> seqID;
         while (iss >> count) {
             totalCount++;
-            if (count < fileMedian * 0.3) {
+            if (count < fileMedian * 0.3) { // organelle genome 3 time larger than nuclear
                 lowCount++;
             }
         }
 
         double lowPercent = 100.0 * lowCount / totalCount;
         //if (lowPercent < 10.0) { //potiential sequencing error
-        if (lowPercent < 20.0 && lowPercent >1.0 ) { //potiential sequencing error, sequencing error should below 1%
+        if ( lowPercent < 20.0 ) { //potiential sequencing error, sequencing error should below 1%
             validSeqIDs_mtx.lock();
             validSeqIDs.insert(seqID);
             validSeqIDs_mtx.unlock();
@@ -221,7 +241,7 @@ int main(int argc, char* argv[]) {
     const std::string inputFile = argv[2];
     int maxThreads = std::stoi(argv[3]);
 
-    std::string tmpFilename = inputFile + ".tmp";
+    std::string tmpFilename = inputFile + ".kmercount.txt";
     tmpFile.open(tmpFilename);
     if (!tmpFile.is_open()) {
         std::cerr << "Could not open temporary file for writing: " << tmpFilename << std::endl;
@@ -247,7 +267,7 @@ int main(int argc, char* argv[]) {
 
     analyzeTmpFile(tmpFilename, fileMedian);
 
-    std::string outputFilename = inputFile + ".filter.fa";
+    std::string outputFilename = inputFile + ".filter.fasta";
     outputValidSequences(inputFile, outputFilename);
 
     return 0;
