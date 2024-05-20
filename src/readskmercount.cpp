@@ -89,7 +89,7 @@ void analyzeTmpFile(const std::string& tmpFilename, double fileMedian) {
         iss >> seqID;
         while (iss >> count) {
             totalCount++;
-            if (count < fileMedian * 0.5) {
+            if (count < fileMedian * 0.3) {
                 lowCount++;
             }
         }
