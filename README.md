@@ -50,6 +50,11 @@ wget https://figshare.com/ndownloader/files/44102183 -O Plant_chlo_mito.fa.gz
 or visit
 https://figshare.com/articles/dataset/Plant_Chloroplast_and_Mitochondrial_Genomes/25018469   
 
+### Docker and Singularity (recommend)
+
+```
+XXXX
+```
 
 ## Usage   
 ### TIPP_plastid   
