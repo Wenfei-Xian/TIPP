@@ -43,7 +43,7 @@ echo "export PATH=$CURRENT_PATH/seqtk:\$PATH" >> ~/.bashrc
 echo "export PATH=$CURRENT_PATH/kmc3/bin:\$PATH" >> ~/.bashrc
 ```
 
-## Chloroplast and Mitochondrial Database for TIPP_plastid   
+## Chloroplast and Mitochondrial Database for TIPP_plastid  (only for v1)  
 ```
 wget https://figshare.com/ndownloader/files/44102183 -O Plant_chlo_mito.fa.gz
 ```
