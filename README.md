@@ -13,7 +13,7 @@ TRF https://github.com/Benson-Genomics-Lab/TRF
 
 ## Dependency for TIPP_plastid
 KMC3 https://github.com/refresh-bio/KMC   
-Flye https://github.com/fenderglass/Flye
+Flye https://github.com/fenderglass/Flye   
 Graphaligner https://github.com/maickrau/GraphAligner   
 TIARA https://github.com/ibe-uw/tiara   
 
