@@ -23,6 +23,7 @@ conda create -n TIPP
 conda activate TIPP python=3.7
 pip install tiara (TIPP_plastid)
 conda install graphaligner (TIPP_plastid)
+conda install flye (TIPP_plastid)
 conda install -c bioconda minimap2 (TIPP_telomere)
 conda install -c bioconda spoa (TIPP_telomere)
 conda install -c bioconda mcl (TIPP_telomere)
