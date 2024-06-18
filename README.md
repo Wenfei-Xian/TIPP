@@ -53,18 +53,15 @@ https://figshare.com/articles/dataset/Plant_Chloroplast_and_Mitochondrial_Genome
 ## Usage   
 ### TIPP_plastid   
 ```
-Usage: TIPP_plastid.pl [options]
+Usage: TIPP_plastid.v2.1.pl [options]
   -h: Show this help message.
-  -d: Chloroplast database (required).
   -f: HiFi reads (required).
-  -g: chloroplast or both (default: both).
-  -t: Threads for Minimap2, Flye, KMC3, Diamond and readskmercount.
-  -n: Number of reads in each downsample, if the read length is short (<=15kb) or the genome size is extremely large, please increase this value (default: 2000 for chlo; mito will be 2*n).
+  -g: chloroplast or organelle (default: organelle).
+  -t: Threads for tiara, flye, KMC3 and readskmercount.
+  -n: Number of reads in each downsample for chloroplast.
   -r: Number of random downsamplings (default: 5).
-  -m: Sequencing platform - either 'pacbio' or 'ont'. Only Q20 reads are accepted (default: pacbio).
+  -p: Sequencing platform - either 'pacbio' or 'ont'. Only Q20 reads are accepted (default: pacbio).
   -i: Assume the presence of the inverted repeats (default: 1).
-  -c: Maximum number of candidate reads used (default: 60000).
-  -p: The proportion of total number of M in cigar / the length of reads, greater than this value is considered a match (default: 0.05, mito will be 2*p).
   -v: version.
 
 ```
