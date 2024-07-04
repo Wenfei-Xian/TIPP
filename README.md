@@ -50,11 +50,55 @@ wget https://figshare.com/ndownloader/files/44102183 -O Plant_chlo_mito.fa.gz
 or visit
 https://figshare.com/articles/dataset/Plant_Chloroplast_and_Mitochondrial_Genomes/25018469   
 
-## Docker and Singularity (recommend)
+## Docker and Singularity (recommended)
+The easiest way to install TIPP is with a Docker container. A image is available at [Dockerhub](https://hub.docker.com/r/weigelworld/tipp) and can be run via Docker or Singularity/Apptainer. A Dockerfile is included in the Github repository, if you prefer to build the image yourself.
+### Run TIPP with Docker
+```
+# Pull the image from Dockerhub
+docker pull weigelworld/tipp:latest
+
+# Start an interactive shell in the container
+docker run -it weigelworld/tipp:latest
+```
+
+Inside the container, the tools described below are directly accessible via command line.
+An example run of TIPP_plastid would work as follows:
+```
+(base) root@84037bc1f36c:~# cd
+# Download an example dataset
+wget -O Arabidopsis_thaliana.4X.fastq.gz https://figshare.com/ndownloader/files/47427487
+# Run TIPP_plastid command
+TIPP_plastid.v2.1.pl -f Arabidopsis_thaliana.4X.fastq.gz
+```
+The above example does not pass data to or from the host system -- please check the [Docker documentation](https://docs.docker.com/storage/bind-mounts/) on how to exchange data between the host system and the container.
+
+As an example, the following command would run an interactive shell in the container and mount the directory `/data/experiments` on the host system and make it available under `/mnt` inside the container:
+```
+docker run -it -v /data/experiments:/mnt weigelworld/tipp:latest
+```
+
+### Run TIPP with Apptainer/Singularity
+Apptainer, or formerly Singularity can be used to easily run TIPP when Docker is not available. If it is not installed on your system, it can be installed without super user rights, e.g. via conda from conda-forge.
+
+The procedure to run TIPP via Singularity/Apptainer is similar to the above. Here, we show an example with apptainer, but the same parameters work with singularity.
 
 ```
-XXXX
+# Pull the image from Dockerhub
+apptainer pull docker://weigelworld/tipp:latest
+
+# Start an interactive shell in the container
+apptainer run tipp_latest.sif
 ```
+Inside the container, the same example commands shown above can be run:
+```
+# Download an example dataset
+wget -O Arabidopsis_thaliana.4X.fastq.gz https://figshare.com/ndownloader/files/47427487
+# Run TIPP_plastid command
+TIPP_plastid.v2.1.pl -f Arabidopsis_thaliana.4X.fastq.gz
+```
+
+By default, apptainer mounts your home and the current working directory inside the container. Thus, your data will be stored on the host file system. You can mount additional volumes as required (see [Apptainer documentation](https://apptainer.org/docs/user/main/bind_paths_and_mounts.html) ).
+
 
 ## Usage   
 ### TIPP_plastid   
@@ -87,7 +131,7 @@ Usage: TIPP_telomere.pl
 ## Errors I met
 1) /tmp is full   
 2) lower version of singularity
-3) when coverage is high, sopa will be killed because of high memery usage, downsample could be a good option to solve it.
+3) when coverage is high, sopa will be killed because of high memory usage, downsample could be a good option to solve it.
 4) storage is full.
 5) g++: error: unrecognized command line option '-std=c++14', please update the gcc - conda install gcc_linux-64 (KMC3)
 6) plase use seqtk https://github.com/Wenfei-Xian/seqtk (forked from lh3/seqtk) 
