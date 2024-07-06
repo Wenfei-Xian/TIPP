@@ -332,7 +332,7 @@ if( $organelle eq 'both' ){
 		print "###Starting to process the reads retrieved from minimap2\n";
 
 		system("mkdir $fastq_name.$organelle/$fastq_name.mitochondrial.reads.minimap2.fasta.tmp");
-		system("$script_dir/kmc3/bin/kmc -t$threads -k31 -cs999999 -ci3 -fa $fastq_name.$organelle/$fastq_name.mitochondrial.reads.minimap2.fasta $fastq_name.$organelle/$fastq.mitochondrial.reads.minimap2.fasta $fastq_name.$organelle/$fastq_name.mitochondrial.reads.minimap2.fasta.tmp");
+		system("$script_dir/kmc3/bin/kmc -t$threads -k31 -cs999999 -ci3 -fa $fastq_name.$organelle/$fastq_name.mitochondrial.reads.minimap2.fasta $fastq_name.$organelle/$fastq_name.mitochondrial.reads.minimap2.fasta $fastq_name.$organelle/$fastq_name.mitochondrial.reads.minimap2.fasta.tmp");
 		system("rm -rf $fastq_name.$organelle/$fastq_name.mitochondrial.reads.minimap2.fasta.tmp");
 
 		if($threads >12 ){
