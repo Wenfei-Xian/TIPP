@@ -17,6 +17,8 @@ Flye https://github.com/fenderglass/Flye
 Graphaligner https://github.com/maickrau/GraphAligner   
 TIARA https://github.com/ibe-uw/tiara   
 
+## Reference free approach TIPP_plastid_v2.1, reference rely TIPP_plastid_v1
+
 ## Installation
 ```
 conda create -n TIPP
