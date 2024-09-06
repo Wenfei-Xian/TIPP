@@ -1,3 +1,16 @@
+# TIPP_plastid: A User-Friendly Tool for De Novo Assembly of Organellar Genomes with HiFi Data
+
+## Contents ##
+
+* [General Introduction](#Name-of-TIPP)
+* [Dependencies for TIPP_telomere](#Dependencies-for-TIPP_telomere)
+* [Dependency for TIPP_plastid_v2.1](#Dependency-for-TIPP_plastid_v2.1)
+* [Installation and Run](#Installation)
+    * [General](#Installation)
+    * [Docker and Singularity](#Docker-and-Singularity)
+      * [Run TIPP with Docker](#Run-TIPP-with-Docker)
+      * [Run TIPP with Apptainer/Singularity](#Run-TIPP-with-Apptainer/Singularity)
+
 ## Name of TIPP
 When I heard that the Tübingen International PhD Program (TIPP) had stopped recruiting new PhD students, I was in the process of naming three small tools I was working on. Coincidentally, I realized that the three small tools I was developing could be combined to form Telomere local assembly, Improved whole genome polish, and Plastid assembly (TIPP), which I decided to use to commemorate the program that allowed me to continue my PhD studies.   
 Although the TIPP program has ceased, the IMPRS PhD program continues! Those interested can read more at the following link: https://www.phd.tuebingen.mpg.de/imprs.   
