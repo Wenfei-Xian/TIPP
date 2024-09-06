@@ -53,7 +53,7 @@ If you are utilizing a Windows-based system or laptop, it is recommended to run 
 
 Moreover, it's worth mentioning that Ubuntu is also available as [Windows Subsystem for Linux (WSL)](https://ubuntu.com/tutorials/install-ubuntu-on-wsl2-on-windows-11-with-gui-support#1-overview). WSL allows you to install a complete Ubuntu terminal environment on your Windows machine, enabling you to seamlessly develop and run cross-platform applications without leaving the Windows environment. Installing WSL is a breeze, whether you opt for PowerShell or the Windows Store app. As of November 2022, WSL is now available as a Windows Store app for both Windows 10 and Windows 11. This means you have multiple convenient options to set up Ubuntu on your Windows system for an enhanced and hassle-free experience.
 
-Please note that the availability of Ubuntu as WSL provides you with flexibility and ease of use, eliminating the need for previous tutorials related to installing WSL as a Windows feature.
+Please note that the availability of Ubuntu through WSL offers flexibility and ease of use, allowing you to run TIPP_plastid even as a Windows user.
 
 So, whether you choose VirtualBox or WSL, integrating Linux into your Windows environment will enable you to seamlessly carry out the TIPP_plastid and ensure a smooth and efficient analysis process. </div>
 
