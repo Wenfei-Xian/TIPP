@@ -9,7 +9,7 @@
     * [General](#Installation)
     * [Note for Windows User](#Note-for-Windows-User)
     * [Chloroplast and Mitochondrial Database for TIPP_plastid  (only for v1)](#Chloroplast-and-Mitochondrial-Database-for-TIPP_plastid  (only for v1) )
-    * [Docker and Singularity](#Docker-and-Singularity)
+    * [Docker and Singularity (recommended)](#Docker-and-Singularity (recommended))
       * [Run TIPP with Docker](#Run-TIPP-with-Docker)
       * [Run TIPP with Apptainer/Singularity](#Run-TIPP-with-Apptainer/Singularity)
 * [Usage](#Usage)
