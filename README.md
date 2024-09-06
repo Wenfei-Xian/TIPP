@@ -4,7 +4,7 @@
 
 * [General Introduction](#Name-of-TIPP)
 * [Dependencies for TIPP_telomere](#Dependencies-for-TIPP_telomere)
-* [Dependency for TIPP_plastid_v2.1](#Dependency-for-TIPP_plastid_v2.1)
+* [Dependency for TIPP_plastid_v2.1](#Dependency-for-TIPP_plastid_v2_1)
 * [Installation and Run](#Installation)
     * [General](#Installation)
     * [Docker and Singularity](#Docker-and-Singularity)
