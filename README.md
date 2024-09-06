@@ -151,7 +151,7 @@ Usage: TIPP_telomere.pl
 6) plase use seqtk https://github.com/Wenfei-Xian/seqtk (forked from lh3/seqtk) 
 
 ## Citation
-Citation for TIPP_plastid: https://www.biorxiv.org/content/10.1101/2024.01.29.577798v1
+Citation for TIPP_plastid: [https://www.biorxiv.org/content/10.1101/2024.01.29.577798v2](https://www.biorxiv.org/content/10.1101/2024.01.29.577798v2)
 
 ### Please cite the dependencies if you use TIPP_plastid:   
 Flye: https://www.nature.com/articles/s41587-019-0072-8   
