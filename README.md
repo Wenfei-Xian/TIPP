@@ -89,7 +89,11 @@ or visit
 https://figshare.com/articles/dataset/Plant_Chloroplast_and_Mitochondrial_Genomes/25018469   
 
 ## Docker and Singularity (recommended)
+<div align="justify">
+   
 The easiest way to install TIPP is with a Docker container. A image is available at [Dockerhub](https://hub.docker.com/r/weigelworld/tipp) and can be run via Docker or Singularity/Apptainer. A Dockerfile is included in the Github repository, if you prefer to build the image yourself.
+</div>
+
 ### Run TIPP with Docker
 ```
 # Pull the image from Dockerhub
