@@ -17,10 +17,10 @@
    * [TIPP_telomere](#TIPP_telomere)
 * [Errors I met](#Errors-I-met)
 * [Citation](#Citation)
-* [Please cite the dependencies if you use TIPP_plastid](#Please-cite-the-dependencies-if-you-use-TIPP_plastid: ) 
+* [Please cite the dependencies if you use TIPP_plastid](#Please-cite-the-dependencies-if-you-use-TIPP_plastid:)
 
 
-## Name of TIPP
+## Name of TIPP ##
 <div align="justify">
 
 When I heard that the Tübingen International PhD Program (TIPP) had stopped recruiting new PhD students, I was in the process of naming three small tools I was working on. Coincidentally, I realized that the three small tools I was developing could be combined to form Telomere local assembly, Improved whole genome polish, and Plastid assembly (TIPP), which I decided to use to commemorate the program that allowed me to continue my PhD studies.   
