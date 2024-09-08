@@ -17,7 +17,7 @@
    * [TIPP_telomere](#TIPP_telomere)
 * [Errors I met](#Errors-I-met)
 * [Citation](#Citation)
-* [Please cite the dependencies if you use TIPP_plastid:](#Please-cite-the-dependencies-if-you-use-TIPP_plastid:) 
+* [Please cite the dependencies if you use TIPP_plastid](#Please-cite-the-dependencies-if-you-use-TIPP_plastid:) 
 
 ## Name of TIPP
 <div align="justify">
@@ -171,6 +171,7 @@ Usage: TIPP_telomere.pl
 ```
 
 ## Errors I met
+
 1) /tmp is full   
 2) lower version of singularity
 3) when coverage is high, sopa will be killed because of high memory usage, downsample could be a good option to solve it.
@@ -179,9 +180,11 @@ Usage: TIPP_telomere.pl
 6) plase use seqtk https://github.com/Wenfei-Xian/seqtk (forked from lh3/seqtk) 
 
 ## Citation
+
 Citation for TIPP_plastid: [https://www.biorxiv.org/content/10.1101/2024.01.29.577798v2](https://www.biorxiv.org/content/10.1101/2024.01.29.577798v2)
 
-### Please cite the dependencies if you use TIPP_plastid:   
+### Please cite the dependencies if you use TIPP_plastid:
+
 Flye: https://www.nature.com/articles/s41587-019-0072-8   
 KMC: https://academic.oup.com/bioinformatics/article/33/17/2759/3796399   
 Graphaligner: https://genomebiology.biomedcentral.com/articles/10.1186/s13059-020-02157-2   
