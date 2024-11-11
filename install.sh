@@ -28,4 +28,6 @@ cd ..
 # Compile the readskmercount program
 g++ -o readskmercount -I./kmc3 readskmercount.opt.cpp -L./kmc3/bin -lkmc_core -pthread
 
+chmod +x src/*.pl
+
 echo "Installation completed successfully."
