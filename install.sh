@@ -3,6 +3,8 @@
 # Exit on any error
 set -e
 
+chmod +x src/*.pl
+
 # Initialize and update the main submodule
 git submodule update --init
 
@@ -28,6 +30,9 @@ cd ..
 # Compile the readskmercount program
 g++ -o readskmercount -I./kmc3 readskmercount.opt.cpp -L./kmc3/bin -lkmc_core -pthread
 
-chmod +x src/*.pl
+CURRENT_PATH=$(pwd)/src
+echo "export PATH=$CURRENT_PATH:\$PATH" >> ~/.bashrc
+echo "export PATH=$CURRENT_PATH/seqtk:\$PATH" >> ~/.bashrc
+echo "export PATH=$CURRENT_PATH/kmc3/bin:\$PATH" >> ~/.bashrc
 
 echo "Installation completed successfully."
