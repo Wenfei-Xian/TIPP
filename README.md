@@ -46,8 +46,8 @@ TIARA https://github.com/ibe-uw/tiara
 
 ## Installation
 ```
-conda create -n TIPP
-conda activate TIPP python=3.7
+conda create -n TIPP python=3.7
+conda activate TIPP
 pip install tiara (TIPP_plastid)
 conda install graphaligner (TIPP_plastid)
 conda install flye (TIPP_plastid)
