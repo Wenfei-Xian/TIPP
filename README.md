@@ -147,7 +147,7 @@ By default, apptainer mounts your home and the current working directory inside 
 ## Usage   
 ### TIPP_plastid   
 ```
-Usage: TIPP_plastid.v2.1.pl [options]
+Usage: ./TIPPo.v2.2.pl [options]
   -h: Show this help message.
   -f: HiFi reads (required).
   -g: chloroplast or organelle (default: organelle).
@@ -156,8 +156,10 @@ Usage: TIPP_plastid.v2.1.pl [options]
   -r: Number of random downsamplings (default: 5).
   -p: Sequencing platform - either 'pacbio' or 'ont'. Only Q20 reads are accepted (default: pacbio).
   -i: Assume the presence of the inverted repeats (default: 1).
+  -l: lower kmer count - lkc (default: 0.3).
+  -c: high kmer count - hkc (default: 5).
+  -m: minimum overlap in repeat graph construction (default:800)
   -v: version.
-
 ```
 ### TIPP_telomere   
 ```
