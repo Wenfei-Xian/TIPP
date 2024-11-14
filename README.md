@@ -145,7 +145,7 @@ By default, apptainer mounts your home and the current working directory inside 
 
 
 ## Usage   
-### TIPP_plastid   
+### TIPPo   
 ```
 Usage: ./TIPPo.v2.2.pl [options]
   -h: Show this help message.
