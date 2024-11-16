@@ -186,8 +186,8 @@ for (my $round=1; $round<=$round_cutoff; $round++){
 						my$SSC_RC=reverse_complement($SSC);
 						my$IR_R=reverse_complement($IR);
 						open my$heteroplasmy,">$fastq_name.$organelle/$fastq_name_reads.filter.$reads_num.round$round.$Edge.$unique_array[0].$unique_array[1].$organelle.chloroplast.fasta" or die "Can't open $fastq_name.$organelle/$fastq_name_reads.filter.$reads_num.round$round.$Edge.$unique_array[0].$unique_array[1].$organelle.chloroplast.fasta";
-						print $heteroplasmy ">Heteroplasmy1\n$LSC$IR$SSC$IR_R\n";
-						print $heteroplasmy ">Heteroplasmy2\n$LSC$IR$SSC_RC$IR_R\n";
+						print $heteroplasmy ">Configuration1\n$LSC$IR$SSC$IR_R\n";
+						print $heteroplasmy ">Configuration2\n$LSC$IR$SSC_RC$IR_R\n";
 						system("ln -s $fastq_name_reads.filter.$reads_num.round$round.fasta.chloroplast.flye/assembly_graph.gfa $fastq_name.$organelle/$fastq_name_reads.filter.$reads_num.round$round.$organelle.chloroplast.gfa");
 					}
 				}
