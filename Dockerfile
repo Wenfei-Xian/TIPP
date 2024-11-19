@@ -10,9 +10,9 @@
     # Create the TIPP environment and install required packages
     RUN conda init bash
 
-    RUN bash -c "source /root/.bashrc && conda create -n TIPP -y" && \
+    RUN bash -c "source /root/.bashrc && conda create --override-channels -c conda-forge -n TIPP -y" && \
     bash -c "source /root/.bashrc && conda activate TIPP && \
-    conda install -c conda-forge -c bioconda -c r \
+    conda install --override-channels -c conda-forge -c bioconda -c r \
        boost=1.85.0 \
        diamond \
        minimap2 \
