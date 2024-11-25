@@ -1,31 +1,55 @@
-{% set name = "click" %}
-{% set version = "7.0" %}
-
 package:
-  name: "{{ name|lower }}"
-  version: "{{ version }}"
+  name: tipp
+  version: "1.1.0"
 
 source:
-  url: https://pypi.io/packages/source/{{ name[0] }}/{{ name }}/{{ name }}-{{ version }}.tar.gz
-  sha256: 5b94b49521f6456670fdb30cd82a4eca9412788a93fa6dd6df72c94d5a8ff2d7
+  git_url: https://github.com/Wenfei-Xian/TIPP.git
+  git_tag: v1.1.0
+  sha256: a3e57e709c206b742a954524b3f1d304d435e6f3cbe85617ade745b8ef5d5d7f
 
 build:
   number: 0
-  script: "{{ PYTHON }} -m pip install . --no-deps --ignore-installed -vv "
+  skip: True  # [osx]
+  run_exports:
+    - {{ pin_subpackage('tipp', max_pin="x.x") }}
 
 requirements:
+  build:
+    - {{ compiler('cxx') }}  # For compiling C++ code
+    - make
+    - kmc
   host:
-    - pip
-    - python
+    - python >=3.8,<3.9
+    - zlib
+    - perl
   run:
-    - python
-
+    - python >=3.8,<3.9
+    - libxcrypt
+    - tiara
+    - graphaligner =1.0.17
+    - flye
+    - minimap2 =2.26
+    - spoa =4.1.4
+    - mcl =22.282
+    - r-pheatmap =1.0.12
+    - r-igraph =1.5.1
+    - bioconductor-biostrings =2.68.1
+    - r-stringdist =0.9.10
+    - r-ggplot2 =3.4.4
+    - trf =4.09.1
+    - zlib
+    - perl
 test:
-  imports:
-    - click
+  commands:
+    - TIPP_plastid.v2.1.pl -h
+    - TIPP_telomere.pl -h
 
 about:
-  home: https://palletsprojects.com/p/click/
-  license: BSD
-  license_family: BSD
-  summary: Composable command line interface toolkit
+  home: https://github.com/Wenfei-Xian/TIPP
+  license: "GPL-3.0-or-later"
+  license_family: GPL3
+  summary: "TIPP: A User-Friendly Tool for De Novo Assembly of Organellar Genomes with HiFi Data"
+
+extra:
+  skip-lints:
+    - uses_vcs_url
