@@ -1,5 +1,7 @@
 # TIPP_plastid: A User-Friendly Tool for De Novo Assembly of Organellar Genomes with HiFi Data
 [![install with bioconda](https://img.shields.io/badge/install%20with-bioconda-brightgreen.svg?style=flat)](https://anaconda.org/bioconda/tipp) [![Downloads](https://anaconda.org/bioconda/tipp/badges/downloads.svg)](https://anaconda.org/bioconda/tipp)
+### Note Conda currently includes version 1.1.0, which does not have TIPPo.v2.2.pl. We will update it soon
+
 ## Contents ##
 
 * [General Introduction](#Name-of-TIPP)
