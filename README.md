@@ -44,7 +44,18 @@ TIARA https://github.com/ibe-uw/tiara
 
 ## Reference free approach TIPP_plastid_v2.1, reference rely TIPP_plastid_v1
 
+
+ 
+
 ## Installation
+
+Via Conda [![install with bioconda](https://img.shields.io/badge/install%20with-bioconda-brightgreen.svg?style=flat)](https://anaconda.org/bioconda/tipp)
+```
+conda create -n TIPP
+conda activate TIPP
+conda install bioconda::tipp
+```
+
 ```
 conda create -n TIPP python=3.7
 conda activate TIPP
