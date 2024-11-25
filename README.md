@@ -49,12 +49,13 @@ TIARA https://github.com/ibe-uw/tiara
 
 ## Installation
 
-Via Conda [![install with bioconda](https://img.shields.io/badge/install%20with-bioconda-brightgreen.svg?style=flat)](https://anaconda.org/bioconda/tipp)
+## Via Conda [![install with bioconda](https://img.shields.io/badge/install%20with-bioconda-brightgreen.svg?style=flat)](https://anaconda.org/bioconda/tipp)
 ```
 conda create -n TIPP
 conda activate TIPP
 conda install bioconda::tipp
 ```
+## Manual
 
 ```
 conda create -n TIPP python=3.7
