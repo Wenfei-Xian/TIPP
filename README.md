@@ -18,7 +18,7 @@
    * [TIPP_telomere](#TIPP_telomere)
 * [Errors I met](#Errors-I-met)
 * [Citation](#Citation)
-* [Please cite the dependencies if you use TIPP_plastid](#Please-cite-the-dependencies-if-you-use-TIPP_plastid) 
+* [Please cite the dependencies if you use TIPPo](#Please-cite-the-dependencies-if-you-use-TIPPo) 
 
 
 ## Name of TIPP ##
