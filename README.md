@@ -64,11 +64,11 @@ conda install bioconda::tipp
 ```
 conda create -n TIPP python=3.7
 conda activate TIPP
-pip install tiara (TIPP_plastid)
-conda install graphaligner (TIPP_plastid)
-conda install bioconda::trf (TIPP_plastid)
-conda install bioconda::flye (TIPP_plastid)
-conda install -c bioconda minimap2 (TIPP_telomere)
+pip install tiara (TIPPo)
+conda install bioconda::graphaligner (TIPPo)
+conda install bioconda::trf (TIPPo)
+conda install bioconda::flye (TIPPo)
+conda install -c bioconda minimap2 (TIPPo & TIPP_telomere)
 conda install -c bioconda spoa (TIPP_telomere)
 conda install -c bioconda mcl (TIPP_telomere)
 conda install -c bioconda r-pheatmap (TIPP_telomere)
