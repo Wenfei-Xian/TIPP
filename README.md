@@ -14,7 +14,7 @@
       * [Run TIPP with Docker](#Run-TIPP-with-Docker)
       * [Run TIPP with Apptainer/Singularity](#Run-TIPP-with-Apptainer/Singularity)
 * [Usage](#Usage)
-   * [TIPP_plastid](#TIPP_plastid)
+   * [TIPPo](#TIPPo)
    * [TIPP_telomere](#TIPP_telomere)
 * [Errors I met](#Errors-I-met)
 * [Citation](#Citation)
