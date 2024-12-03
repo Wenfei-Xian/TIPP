@@ -159,18 +159,20 @@ By default, apptainer mounts your home and the current working directory inside 
 ## Usage   
 ### TIPPo   
 ```
-Usage: ./TIPPo.v2.3.pl [options]
+Usage: /tmp/global2/wxian/software/TIPP/src/TIPPo.v2.3.pl [options]
   -h: Show this help message.
   -f: HiFi reads (required).
   -g: chloroplast or organelle (default: organelle).
   -t: Threads for tiara, flye, KMC3 and readskmercount.
   -n: Number of reads in each downsample for chloroplast.
   -r: Number of random downsamplings (default: 5).
-  -p: Sequencing platform - either 'pacbio' or 'ont'. Only Q20 reads are accepted (default: pacbio).
   -i: Assume the presence of the inverted repeats (default: 1).
   -l: lower kmer count - lkc (default: 0.3).
   -c: high kmer count - hkc (default: 5).
+  -y: parameter for flye (default: --pacbio-hifi).
+  -a: parameter for minimap2 (default: map-hifi).
   -m: minimum overlap in repeat graph construction (default:800)
+  -b: reference sequence (default: No).
   -v: version.
 ```
 ### TIPP_telomere   
