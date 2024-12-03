@@ -150,7 +150,7 @@ Inside the container, the same example commands shown above can be run:
 # Download an example dataset
 wget -O Arabidopsis_thaliana.4X.fastq.gz https://figshare.com/ndownloader/files/47427487
 # Run TIPP_plastid command
-TIPP_plastid.v2.1.pl -f Arabidopsis_thaliana.4X.fastq.gz
+TIPPo_v2.3.pl -f Arabidopsis_thaliana.4X.fastq.gz
 ```
 
 By default, apptainer mounts your home and the current working directory inside the container. Thus, your data will be stored on the host file system. You can mount additional volumes as required (see [Apptainer documentation](https://apptainer.org/docs/user/main/bind_paths_and_mounts.html) ).
