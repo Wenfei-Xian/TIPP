@@ -37,15 +37,11 @@ Minimap2 https://github.com/lh3/minimap2
 seqtk https://github.com/Wenfei-Xian/seqtk (forked from lh3/seqtk)  
 TRF https://github.com/Benson-Genomics-Lab/TRF   
 
-## Dependency for TIPP_plastid_v2.1
+## Dependency for TIPPo
 KMC3 https://github.com/refresh-bio/KMC   
 Flye https://github.com/fenderglass/Flye   
 Graphaligner https://github.com/maickrau/GraphAligner   
 TIARA https://github.com/ibe-uw/tiara   
-
-## Reference free approach TIPP_plastid_v2.1, reference rely TIPP_plastid_v1
-
-
  
 
 ## Installation
