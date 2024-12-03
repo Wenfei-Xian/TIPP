@@ -28,7 +28,7 @@ make
 cd ..
 
 # Compile the readskmercount program
-g++ -o readskmercount -I./kmc3 readskmercount.opt.cpp -L./kmc3/bin -lkmc_core -pthread
+g++ -o readskmercount -I./kmc3 readskmercount.opt.parameter.cpp -L./kmc3/bin -lkmc_core -pthread
 
 CURRENT_PATH=$(pwd)
 echo "export PATH=$CURRENT_PATH:\$PATH" >> ~/.bashrc
