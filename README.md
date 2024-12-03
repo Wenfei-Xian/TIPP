@@ -159,7 +159,7 @@ By default, apptainer mounts your home and the current working directory inside 
 ## Usage   
 ### TIPPo   
 ```
-Usage: ./TIPPo.v2.2.pl [options]
+Usage: ./TIPPo.v2.3.pl [options]
   -h: Show this help message.
   -f: HiFi reads (required).
   -g: chloroplast or organelle (default: organelle).
