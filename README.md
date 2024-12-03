@@ -5,7 +5,7 @@
 
 * [General Introduction](#Name-of-TIPP)
 * [Dependencies for TIPP_telomere](#Dependencies-for-TIPP_telomere)
-* [Dependency for TIPP_plastid_v2.1](#Dependency-for-TIPP_plastid_v2.1)
+* [Dependency for TIPPo](#Dependency-for-TIPPo)
 * [Installation and Run](#Installation)
     * [General](#Installation)
     * [Note for Windows User](#Note-for-Windows-User)
