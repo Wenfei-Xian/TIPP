@@ -62,7 +62,7 @@ conda create -n TIPP python=3.7
 conda activate TIPP
 pip install tiara (TIPPo)
 conda install bioconda::graphaligner (TIPPo)
-conda install bioconda::trf (TIPPo)
+conda install bioconda::trf (TIPPo & TIPP_telomere)
 conda install bioconda::flye (TIPPo)
 conda install bioconda::minimap2 (TIPPo & TIPP_telomere)
 conda install -c bioconda spoa (TIPP_telomere)
