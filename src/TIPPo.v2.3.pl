@@ -26,7 +26,7 @@ my$reference;
 #v2.0: May 20, 2024; reference free
 #v2.1: May 26, 2024; exclude ultrl high frequency reads
 #v2.2: Nov 11, 2024; accept the file with the absoult path, reconstructe the repeat graph with smaller overlap length;
-#v3.0: Nov 25, 2024; intergrated the reference based approach 
+#v2.3: Dec 03, 2024; intergrated the reference based approach 
 my$show_version = 0;
 
 GetOptions(
