@@ -158,8 +158,9 @@ if( defined $reference ){
 else{
 
 	system("mkdir $fastq_name.$organelle/$fastq_name.tmp");
-	system("$script_dir/kmc3/bin/kmc -t$threads -k31 -cs999999 -ci2 -fa $input $fastq_name.$organelle/$fastq_name $fastq_name.$organelle/$fastq_name.tmp");
-	system("rm -rf $fastq_name.$organelle/$fastq_name.tmp");
+	#system("$script_dir/kmc3/bin/kmc -t$threads -k31 -cs999999 -ci2 -fa $input $fastq_name.$organelle/$fastq_name $fastq_name.$organelle/$fastq_name.tmp");
+	system("kmc -t$threads -k31 -cs999999 -ci2 -fa $input $fastq_name.$organelle/$fastq_name $fastq_name.$organelle/$fastq_name.tmp");
+ 	system("rm -rf $fastq_name.$organelle/$fastq_name.tmp");
 
 	system("tiara -i $input -o $fastq_name.$organelle/$fastq_name.tiara.out --to_fasta mit pla  -t $threads");
 	#system("cat $fastq_name.$organelle/mitochondrion_$input $fastq_name.$organelle/plastid_$input > $fastq_name.$organelle/$fastq_name.organelle.fasta");
