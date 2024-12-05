@@ -12,13 +12,11 @@ my$current_directory = cwd();
 my$reads_num=800;
 my$round_cutoff=5;
 my$no_IR=0;
-#my$platform='pacbio';
+my$platform='hifi';
 my$organelle='organelle';
-my$version="v2.3";
+my$version="v2.4";
 my$lkc=0.3;
 my$hkc=5;
-my$flyep="--pacbio-hifi";
-my$minimap2p="map-hifi";
 my$minoverlap=800;
 my$reference;
 my$trf;
@@ -37,16 +35,16 @@ GetOptions(
     't=s' => \$threads,
     'n=s' => \$reads_num,
     'i=s' => \$no_IR,
-    #'p=s' => \$platform,
+    'p=s' => \$platform,
     'r=s' => \$round_cutoff,
     'g=s' => \$organelle,
     'v' => \$show_version,
     'l=s' => \$lkc,
     'c=s' => \$hkc,
-    'y=s' => \$flyep,
-    'a=s' => \$minimap2p,
+    #'y=s' => \$flyep,
+    #'a=s' => \$minimap2p,
     'm=s' => \$minoverlap,
-    'b=s' => \$reference,
+    'd=s' => \$reference,
     'trf' => \$trf,
 );
 
@@ -54,11 +52,6 @@ if ($show_version) {
     print "Version: $version\n";
     exit;
 }
-
-#if( $platform ne 'pacbio' && $platform ne 'ont' ){
-#        print "Error, only pacbio or ont can be accecpted for -m\n";
-#        exit;
-#}
 
 if( $organelle ne 'chloroplast' && $organelle ne 'organelle' ){
         print "Error, only chloroplast or organelle can be accecpted for -g\n";
@@ -68,33 +61,43 @@ if( $organelle ne 'chloroplast' && $organelle ne 'organelle' ){
 if ($help or not defined $fastq ) {
 	print "Usage: $0 [options]\n";
 	print "  -h: Show this help message.\n";
-	print "  -f: HiFi reads (required).\n";
+	print "  -f: Long reads (required).\n";
+	print "  -d: reference sequence (default: None).\n";
 	print "  -g: chloroplast or organelle (default: organelle).\n";
 	print "  -t: Threads for tiara, flye, KMC3 and readskmercount.\n";
 	print "  -n: Number of reads in each downsample for chloroplast.\n";
 	print "  -r: Number of random downsamplings (default: 5).\n";
-	#print "  -p: Sequencing platform - either 'pacbio' or 'ont'. Only Q20 reads are accepted (default: pacbio).\n";
-	print "  -i: Assume the presence of the inverted repeats (default: 1).\n";
+	print "  -p: Sequence technology - 'hifi','clr','ont', 'onthq' (default: hifi)\n";
+	print "  -i: Assume the presence of the inverted repeats in the chloroplast genome (default: 1).\n";
 	print "  -l: lower kmer count - lkc (default: 0.3).\n";
 	print "  -c: high kmer count - hkc (default: 5).\n";
-	print "  -y: parameter for flye (default: --pacbio-hifi).\n";
-	print "  -a: parameter for minimap2 (default: map-hifi).\n";
+	#print "  -y: parameter for flye (default: --pacbio-hifi).\n";
+	#print "  -a: parameter for minimap2 (default: map-hifi).\n";
 	print "  -m: minimum overlap in repeat graph construction (default:800)\n";
-	print "  -b: reference sequence (default: No).\n";
-	print "  --trf: remove the reads are tandem repeats (default: used for HiFi reads)\n";
+	print "  --trf: remove the reads are tandem repeats, only avaliable for reference-free and hifi/onthq reads\n";
 	print "  -v: version.\n";
 	exit;
 }
 
-for my $tool ("flye","tiara","GraphAligner","trf") {
+if (defined $reference) {
+    print "TIPPo $version\n";
+    print "Reference sequence is provided: $reference. It will be used to extract the organellar reads.\n";
+    print "Note: The reference sequence ID should contain 'Chloroplast' or 'Mitochondrion'.\n";
+} else {
+    print "TIPPo $version\n";
+    print "A reference-free approach will be used to extract the organellar reads.\n";
+}
+
+for my $tool ("flye","tiara","GraphAligner","trf","minimap2") {
 	my $return_val = system("which $tool > /dev/null 2>&1");
 	if ($return_val != 0) {
 		die "Error: $tool does not seem to be installed or is not in the PATH. Please check.\n";
 	}
 }
 
-#my$flyep=join " ",@flyep_array;
-#my$minimap2p=join " ",@minimap2_array;
+my%minimap2_parameter=('hifi'=>'map-hifi','clr'=>'map-pb','ont'=>'map-ont','onthq'=>'map-ont');
+my%flye_parameter=('hifi'=>'--pacbio-hifi','clr'=>'--pacbio-raw','ont'=>'--nano-raw','onthq'=>'--nano-hq');
+my%graphAligner_parameter=('hifi'=>'0.9','clr'=>'0.6','ont'=>'0.6','onthq'=>0.9);
 
 my$script_dir = ($0 =~ m{(.*/)?})[0];
 
@@ -125,10 +128,9 @@ if( defined $reference ){
 	my%chloroplast_map_hash;
 	my%mito_minimap_hash;
 
-	print "minimap2 --secondary no --sam-hit-only -ax $minimap2p -t $threads $reference $input |";
-	open ALIGN,"minimap2 --secondary no --sam-hit-only -ax $minimap2p -t $threads $reference $input |";
-	open OUT1_CHLO,">$fastq_name.$organelle/$fastq_name_reads.filter.fasta";
-	open OUT2_CHLO,">$fastq_name.$organelle/$fastq_name_reads.filter.fasta.sam";
+	open ALIGN,"minimap2 --secondary no --sam-hit-only -ax $minimap2_parameter{$platform} -t $threads $reference $input |";
+	open OUT1_CHLO,">$fastq_name.$organelle/$fastq_name_reads.map.fasta";
+	open OUT2_CHLO,">$fastq_name.$organelle/$fastq_name_reads.map.fasta.sam";
 	open OUT3_MITO,">$fastq_name.$organelle/$fastq_name.mitochondrial_tag.fasta"; #$fastq_name.mitochondrial_tag.fasta
 	open OUT4_MITO,">$fastq_name.$organelle/$fastq_name.mitochondrial_tag.fasta.sam";
 	open OUT5_MITO,">$fastq_name.$organelle/$fastq_name.mitochondrial_tag.ID";
@@ -158,16 +160,25 @@ if( defined $reference ){
 			}
 		}
 	}
+
+	if( $platform eq 'hifi' || $platform eq 'onthq' ){
+		system("mkdir $fastq_name.$organelle/$fastq_name_reads.map.fasta.tmp");
+		system("kmc -t$threads -k31 -cs999999 -ci2 -fa $fastq_name.$organelle/$fastq_name_reads.map.fasta $fastq_name.$organelle/$fastq_name_reads.map.fasta $fastq_name.$organelle/$fastq_name_reads.map.fasta.tmp");
+		system("rm -rf $fastq_name.$organelle/$fastq_name_reads.map.fasta.tmp");
+		system("$script_dir/readskmercount $fastq_name.$organelle/$fastq_name_reads.map.fasta $fastq_name.$organelle/$fastq_name_reads.map.fasta $threads $lkc $hkc");
+		system("mv $fastq_name.$organelle/$fastq_name_reads.map.fasta.filter.fasta $fastq_name.$organelle/$fastq_name_reads.filter.fasta");
+	}
+	else{
+		system("mv $fastq_name.$organelle/$fastq_name_reads.map.fasta $fastq_name.$organelle/$fastq_name_reads.filter.fasta");
+	}
 }
 else{
 
 	system("mkdir $fastq_name.$organelle/$fastq_name.tmp");
-	#system("$script_dir/kmc3/bin/kmc -t$threads -k31 -cs999999 -ci2 -fa $input $fastq_name.$organelle/$fastq_name $fastq_name.$organelle/$fastq_name.tmp");
 	system("kmc -t$threads -k31 -cs999999 -ci2 -fa $input $fastq_name.$organelle/$fastq_name $fastq_name.$organelle/$fastq_name.tmp");
  	system("rm -rf $fastq_name.$organelle/$fastq_name.tmp");
 
-	system("tiara -i $input -o $fastq_name.$organelle/$fastq_name.tiara.out --to_fasta mit pla  -t $threads");
-	#system("cat $fastq_name.$organelle/mitochondrion_$input $fastq_name.$organelle/plastid_$input > $fastq_name.$organelle/$fastq_name.organelle.fasta");
+	system("tiara -i $input -o $fastq_name.$organelle/$fastq_name.tiara.out --to_fasta mit pla -t $threads");
 	system("grep mitochondrion $fastq_name.$organelle/$fastq_name.tiara.out | awk '{print \$1}' > $fastq_name.$organelle/$fastq_name.mitochondrial_tag.ID");
 	system("mv $fastq_name.$organelle/plastid_$input_name $fastq_name.$organelle/$fastq_name_reads");
 	system("mv $fastq_name.$organelle/mitochondrion_$input_name $fastq_name.$organelle/$fastq_name.mitochondrial_tag.fasta");
@@ -183,7 +194,7 @@ for (my $round=1; $round<=$round_cutoff; $round++){
 
 	system("$script_dir/seqtk/seqtk sample -s$round $fastq_name.$organelle/$fastq_name_reads.filter.fasta $reads_num > $fastq_name.$organelle/$fastq_name_reads.filter.$reads_num.round$round.fasta");
 	
-	system("flye $flyep $fastq_name.$organelle/$fastq_name_reads.filter.$reads_num.round$round.fasta --threads $threads -o $fastq_name.$organelle/$fastq_name_reads.filter.$reads_num.round$round.fasta.chloroplast.flye");
+	system("flye $flye_parameter{$platform} $fastq_name.$organelle/$fastq_name_reads.filter.$reads_num.round$round.fasta --threads $threads -o $fastq_name.$organelle/$fastq_name_reads.filter.$reads_num.round$round.fasta.chloroplast.flye");
 
 	if( $no_IR == 0 ){ # assumed that the chloroplast carries inverted repeats
 	
@@ -238,8 +249,8 @@ for (my $round=1; $round<=$round_cutoff; $round++){
 						my$SSC_RC=reverse_complement($SSC);
 						my$IR_R=reverse_complement($IR);
 						open my$heteroplasmy,">$fastq_name.$organelle/$fastq_name_reads.filter.$reads_num.round$round.$Edge.$unique_array[0].$unique_array[1].$organelle.chloroplast.fasta" or die "Can't open $fastq_name.$organelle/$fastq_name_reads.filter.$reads_num.round$round.$Edge.$unique_array[0].$unique_array[1].$organelle.chloroplast.fasta";
-						print $heteroplasmy ">Heteroplasmy1\n$LSC$IR$SSC$IR_R\n";
-						print $heteroplasmy ">Heteroplasmy2\n$LSC$IR$SSC_RC$IR_R\n";
+						print $heteroplasmy ">Configuration1\n$LSC$IR$SSC$IR_R\n";
+						print $heteroplasmy ">Configuration2\n$LSC$IR$SSC_RC$IR_R\n";
 						system("ln -s $fastq_name_reads.filter.$reads_num.round$round.fasta.chloroplast.flye/assembly_graph.gfa $fastq_name.$organelle/$fastq_name_reads.filter.$reads_num.round$round.$organelle.chloroplast.gfa");
 					}
 				}
@@ -298,7 +309,7 @@ for (my $round=1; $round<=$round_cutoff; $round++){
 }
 
 if ( $found == 1 ){
-	system( "GraphAligner -g $fastq_name.$organelle/$fastq_name_reads.filter.$reads_num.round$found_round.$organelle.chloroplast.gfa -f $fastq_name.$organelle/$fastq_name.mitochondrial_tag.fasta -x vg -a $fastq_name.$organelle/$fastq_name_reads.graphaligner.chloroplast.gfa.gaf --precise-clipping 0.9 -t $threads");
+	system( "GraphAligner -g $fastq_name.$organelle/$fastq_name_reads.filter.$reads_num.round$found_round.$organelle.chloroplast.gfa -f $fastq_name.$organelle/$fastq_name.mitochondrial_tag.fasta -x vg -a $fastq_name.$organelle/$fastq_name_reads.graphaligner.chloroplast.gfa.gaf --precise-clipping $graphAligner_parameter{$platform} -t $threads");
 	
 	open GA,"$fastq_name.$organelle/$fastq_name_reads.graphaligner.chloroplast.gfa.gaf" or die "Can't open $fastq_name.$organelle/$fastq_name_reads.graphaligner.chloroplast.gfa.gaf\n";
         open GAOUT,">$fastq_name.$organelle/$fastq_name_reads.mito_chloroplast.ID";
@@ -323,7 +334,7 @@ elsif ($found == 0 && keys %hash_assembly_round > 0) {
 		print "$round_assem ";
 		$round_found0=$round_assem;
 	}
-	system( "GraphAligner -g $fastq_name.$organelle/$fastq_name_reads.filter.$reads_num.round$round_found0.fasta.chloroplast.flye/assembly_graph.gfa -f $fastq_name.$organelle/$fastq_name.mitochondrial_tag.fasta -x vg -a $fastq_name.$organelle/$fastq_name_reads.graphaligner.chloroplast.gfa.gaf --precise-clipping 0.9 -t $threads");
+	system( "GraphAligner -g $fastq_name.$organelle/$fastq_name_reads.filter.$reads_num.round$round_found0.fasta.chloroplast.flye/assembly_graph.gfa -f $fastq_name.$organelle/$fastq_name.mitochondrial_tag.fasta -x vg -a $fastq_name.$organelle/$fastq_name_reads.graphaligner.chloroplast.gfa.gaf --precise-clipping $graphAligner_parameter{$platform} -t $threads");
         
 	print "###Start to filter out the GraphAligner result\n";
 	
@@ -357,7 +368,15 @@ if( $organelle eq 'organelle' ){
 	system("$script_dir/seqtk/seqtk subseq $fastq_name.$organelle/$fastq_name.mitochondrial_tag.fasta $fastq_name.$organelle/$fastq_name.mitochondrial.ID > $fastq_name.$organelle/$fastq_name.mitochondrial.fasta");
 
 	if( defined $reference ){
-		system("cp $fastq_name.$organelle/$fastq_name.mitochondrial.fasta $fastq_name.$organelle/$fastq_name.mitochondrial.fasta.filter.fasta");
+		if( $platform eq 'hifi' || $platform eq 'onthq' ){
+			system("mkdir $fastq_name.$organelle/$fastq_name.mitochondrial.fasta.tmp");
+			system("kmc -t$threads -k31 -cs999999 -ci2 -fa $fastq_name.$organelle/$fastq_name.mitochondrial.fasta $fastq_name.$organelle/$fastq_name.mitochondrial.fasta $fastq_name.$organelle/$fastq_name_reads.mitochondrial.fasta.tmp");
+			system("rm -rf $fastq_name.$organelle/$fastq_name.mitochondrial.fasta.tmp");
+			system("$script_dir/readskmercount $fastq_name.$organelle/$fastq_name.mitochondrial.fasta $fastq_name.$organelle/$fastq_name.mitochondrial.fasta $threads $lkc $hkc");
+		}
+		else{
+			system("cp $fastq_name.$organelle/$fastq_name.mitochondrial.fasta $fastq_name.$organelle/$fastq_name.mitochondrial.fasta.filter.fasta");
+		}
 	}	
 	else{
 		if($trf) {
@@ -371,7 +390,6 @@ if( $organelle eq 'organelle' ){
 			system("cat $fastq_name.$organelle/$fastq_name.mitochondrial.fasta.split*.trf.out > $fastq_name.$organelle/$fastq_name.mitochondrial.fasta.trf.out");
 			system("rm $fastq_name.$organelle/$fastq_name.mitochondrial.fasta.split*.fa");
 			system("rm $fastq_name.$organelle/$fastq_name.mitochondrial.fasta.split*.trf.out");
-			#system("trf $fastq_name.$organelle/$fastq_name.mitochondrial.fasta 2 7 7 80 10 100 500 -h -l 6 -ngs > $fastq_name.$organelle/$fastq_name.mitochondrial.fasta.trf.out");
 	
 			open MITO,"$fastq_name.$organelle/$fastq_name.mitochondrial.fasta";
 			$/=">";<MITO>;
@@ -417,7 +435,8 @@ if( $organelle eq 'organelle' ){
 			system("$script_dir/readskmercount $fastq_name.$organelle/$fastq_name $fastq_name.$organelle/$fastq_name.mitochondrial.fasta.trf.fasta $threads $lkc $hkc");
 			system("mv $fastq_name.$organelle/$fastq_name.mitochondrial.fasta.trf.fasta $fastq_name.$organelle/$fastq_name.mitochondrial.fasta.filter.fasta");
 
-		}else{
+		}
+		else{
 	
 			system("$script_dir/readskmercount $fastq_name.$organelle/$fastq_name $fastq_name.$organelle/$fastq_name.mitochondrial.fasta $threads $lkc $hkc");
 		}
@@ -425,7 +444,7 @@ if( $organelle eq 'organelle' ){
 	#for (my $round=1; $round<=$round_cutoff_mito; $round++){
 	#system("$script_dir/seqtk/seqtk sample -s$round $fastq_name.$organelle/$fastq_name.mitochondrial.fasta.filter.fasta $reads_num_m > $fastq_name.$organelle/$fastq_name.mitochondrial.fasta.filter.$reads_num_m.round$round.fasta");
 
-	system("flye $flyep $fastq_name.$organelle/$fastq_name.mitochondrial.fasta.filter.fasta --threads $threads -o $fastq_name.$organelle/$fastq_name.mitochondrial.fasta.filter.fasta.flye");
+	system("flye $flye_parameter{$platform} $fastq_name.$organelle/$fastq_name.mitochondrial.fasta.filter.fasta --threads $threads -o $fastq_name.$organelle/$fastq_name.mitochondrial.fasta.filter.fasta.flye");
 	
 	system("mkdir $fastq_name.$organelle/$fastq_name.mitochondrial.fasta.filter.fasta.flye/50.repeat-graph");
 	system("flye-modules repeat --disjointigs $fastq_name.$organelle/$fastq_name.mitochondrial.fasta.filter.fasta.flye/10-consensus/consensus.fasta --reads $fastq_name.$organelle/$fastq_name.mitochondrial.fasta.filter.fasta --out-dir $fastq_name.$organelle/$fastq_name.mitochondrial.fasta.filter.fasta.flye/50.repeat-graph --config $script_dir/asm_hifi.cfg --min-ovlp $minoverlap --threads $threads");
