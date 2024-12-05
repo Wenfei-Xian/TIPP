@@ -204,7 +204,10 @@ Citation for TIPPo: [https://www.biorxiv.org/content/10.1101/2024.01.29.577798v2
 
 ### Please cite the dependencies if you use TIPPo:
 Flye: https://www.nature.com/articles/s41587-019-0072-8   
-KMC: https://academic.oup.com/bioinformatics/article/33/17/2759/3796399   
 Graphaligner: https://genomebiology.biomedcentral.com/articles/10.1186/s13059-020-02157-2   
+
+Reference free:  
 Tiara: https://academic.oup.com/bioinformatics/article/38/2/344/6375939
+KMC: https://academic.oup.com/bioinformatics/article/33/17/2759/3796399  
+Reference based:  
 Minimap2: https://academic.oup.com/bioinformatics/article/34/18/3094/4994778
