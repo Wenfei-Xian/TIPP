@@ -42,7 +42,8 @@ KMC3 https://github.com/refresh-bio/KMC
 Flye https://github.com/fenderglass/Flye   
 Graphaligner https://github.com/maickrau/GraphAligner   
 TIARA https://github.com/ibe-uw/tiara   
- 
+TRF https://github.com/Benson-Genomics-Lab/TRF  
+Minimap2 https://github.com/lh3/minimap2  
 
 ## Installation
 
