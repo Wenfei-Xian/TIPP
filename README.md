@@ -49,8 +49,6 @@ Minimap2 https://github.com/lh3/minimap2
 
 ## Via Conda [![install with bioconda](https://img.shields.io/badge/install%20with-bioconda-brightgreen.svg?style=flat)](https://anaconda.org/bioconda/tipp)
 
-### Note:- Conda currently includes version 1.1.0, which does not have TIPPo.v2.2.pl. We will update it soon
-
 ```
 conda create -n TIPP
 conda activate TIPP
