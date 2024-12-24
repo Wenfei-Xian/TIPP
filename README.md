@@ -90,9 +90,9 @@ If you are utilizing a Windows-based system or laptop, it is recommended to run 
 
 Moreover, it's worth mentioning that Ubuntu is also available as [Windows Subsystem for Linux (WSL)](https://ubuntu.com/tutorials/install-ubuntu-on-wsl2-on-windows-11-with-gui-support#1-overview). WSL allows you to install a complete Ubuntu terminal environment on your Windows machine, enabling you to seamlessly develop and run cross-platform applications without leaving the Windows environment. Installing WSL is a breeze, whether you opt for PowerShell or the Windows Store app. As of November 2022, WSL is now available as a Windows Store app for both Windows 10 and Windows 11. This means you have multiple convenient options to set up Ubuntu on your Windows system for an enhanced and hassle-free experience.
 
-Please note that the availability of Ubuntu through WSL offers flexibility and ease of use, allowing you to run TIPP_plastid even as a Windows user.
+Please note that the availability of Ubuntu through WSL offers flexibility and ease of use, allowing you to run TIPPo even as a Windows user.
 
-So, whether you choose VirtualBox or WSL, integrating Linux into your Windows environment will enable you to seamlessly carry out the TIPP_plastid and ensure a smooth and efficient analysis process. </div>
+So, whether you choose VirtualBox or WSL, integrating Linux into your Windows environment will enable you to seamlessly carry out the TIPPo and ensure a smooth and efficient analysis process. </div>
 
 ## Chloroplast and Mitochondrial Database for TIPP_plastid  (only for v1)  
 ```
@@ -117,13 +117,13 @@ docker run -it weigelworld/tipp:latest
 ```
 
 Inside the container, the tools described below are directly accessible via command line.
-An example run of TIPP_plastid would work as follows:
+An example run of TIPPo would work as follows:
 ```
 (base) root@84037bc1f36c:~# cd
 # Download an example dataset
 wget -O Arabidopsis_thaliana.4X.fastq.gz https://figshare.com/ndownloader/files/47427487
-# Run TIPP_plastid command
-TIPP_plastid.v2.1.pl -f Arabidopsis_thaliana.4X.fastq.gz
+# Run TIPPo command
+TIPPo.v2.3.pl -f Arabidopsis_thaliana.4X.fastq.gz
 ```
 The above example does not pass data to or from the host system -- please check the [Docker documentation](https://docs.docker.com/storage/bind-mounts/) on how to exchange data between the host system and the container.
 
@@ -148,8 +148,8 @@ Inside the container, the same example commands shown above can be run:
 ```
 # Download an example dataset
 wget -O Arabidopsis_thaliana.4X.fastq.gz https://figshare.com/ndownloader/files/47427487
-# Run TIPP_plastid command
-TIPPo_v2.3.pl -f Arabidopsis_thaliana.4X.fastq.gz
+# Run TIPPo command
+TIPPo.v2.3.pl -f Arabidopsis_thaliana.4X.fastq.gz
 ```
 
 By default, apptainer mounts your home and the current working directory inside the container. Thus, your data will be stored on the host file system. You can mount additional volumes as required (see [Apptainer documentation](https://apptainer.org/docs/user/main/bind_paths_and_mounts.html) ).
