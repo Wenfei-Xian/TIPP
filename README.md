@@ -52,7 +52,7 @@ Minimap2 https://github.com/lh3/minimap2
 ```
 conda create -n TIPP
 conda activate TIPP
-conda install bioconda::tipp
+conda install -c defaults -c conda-forge -c anaconda -c bioconda tipp=1.3.0
 ```
 ## Manual
 
