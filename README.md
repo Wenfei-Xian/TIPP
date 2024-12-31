@@ -198,7 +198,7 @@ Usage: TIPP_telomere.pl
 
 ## Citation
 
-Citation for TIPPo: [https://www.biorxiv.org/content/10.1101/2024.01.29.577798v2](https://www.biorxiv.org/content/10.1101/2024.01.29.577798v2)
+Citation for TIPPo: [https://www.biorxiv.org/content/10.1101/2024.01.29.577798v3](https://www.biorxiv.org/content/10.1101/2024.01.29.577798v3)
 
 ### Please cite the dependencies if you use TIPPo:
 Flye: https://www.nature.com/articles/s41587-019-0072-8   
