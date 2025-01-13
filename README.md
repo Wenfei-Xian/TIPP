@@ -188,7 +188,7 @@ Usage: TIPP_telomere.pl
 
 ```
 
-## Output of TIPPo
+## Output
 
 
 ## Errors I met
