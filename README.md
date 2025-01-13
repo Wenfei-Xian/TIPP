@@ -187,6 +187,9 @@ Usage: TIPP_telomere.pl
 
 ```
 
+## Output of TIPPo
+
+
 ## Errors I met
 
 1) /tmp is full   
