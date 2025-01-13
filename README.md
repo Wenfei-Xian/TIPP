@@ -16,6 +16,7 @@
 * [Usage](#Usage)
    * [TIPPo](#TIPPo)
    * [TIPP_telomere](#TIPP_telomere)
+* [Output](#Output)
 * [Errors I met](#Errors-I-met)
 * [Citation](#Citation)
 * [Please cite the dependencies if you use TIPPo](#Please-cite-the-dependencies-if-you-use-TIPPo) 
