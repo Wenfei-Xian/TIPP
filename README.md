@@ -191,15 +191,15 @@ Usage: TIPP_telomere.pl
 
 ## Output
 ### TIPPo-output
-Chloroplast genome, you can find
+For the **chloroplast genome**, you can find the file at:   
 ```
 your_input_file.chloroplast.fasta.filter.800.round1.edge_*.edge_*.edge_*.organelle.chloroplast.fasta
 ```
-Mitochondrial genome, you can find
+For the **mitochondrial genome**, the file is located at:   
 ```
 your_input_file.mitochondrial.fasta.filter.fasta.flye/assembly_graph.gfa
 ```
-If you interested in the complexity of mitochondrial, you can find
+If you are interested in exploring the **complexity of the mitochondrial genome**, you can find the file at:
 ```
 your_input_file.mitochondrial.fasta.filter.fasta.flye/50.repeat-graph/graph_before_rr.gfa
 ```
