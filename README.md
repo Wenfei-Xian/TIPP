@@ -14,10 +14,10 @@
       * [Run TIPP with Docker](#Run-TIPP-with-Docker)
       * [Run TIPP with Apptainer/Singularity](#Run-TIPP-with-Apptainer/Singularity)
 * [Usage](#Usage)
-   * [TIPPo](#TIPPo)
+   * [TIPPo](#TIPPo-usage)
    * [TIPP_telomere](#TIPP_telomere)
 * [Output](#Output)
-   * [TIPPo](#TIPPo)
+   * [TIPPo](#TIPPo-output)
 * [Errors I met](#Errors-I-met)
 * [Citation](#Citation)
 * [Please cite the dependencies if you use TIPPo](#Please-cite-the-dependencies-if-you-use-TIPPo) 
@@ -158,7 +158,7 @@ By default, apptainer mounts your home and the current working directory inside 
 
 
 ## Usage   
-### TIPPo   
+### TIPPo-usage   
 ```
 Usage: /tmp/global2/wxian/software/TIPP/src/TIPPo.v2.3.pl [options]
   -h: Show this help message.
@@ -190,7 +190,7 @@ Usage: TIPP_telomere.pl
 ```
 
 ## Output
-### TIPPo
+### TIPPo-output
 
 
 
