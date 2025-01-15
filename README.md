@@ -215,7 +215,7 @@ your_input_file.mitochondrial.fasta.filter.fasta.flye/50.repeat-graph/graph_befo
 
 ## Citation
 
-Citation for TIPPo: [https://www.biorxiv.org/content/10.1101/2024.01.29.577798v3](https://www.biorxiv.org/content/10.1101/2024.01.29.577798v3)
+Citation for TIPPo: Wenfei Xian, Ilja Bezrukov, Zhigui Bao, Sebastian Vorbrugg, Anupam Gautam, Detlef Weigel, TIPPo: A User-Friendly Tool for De Novo Assembly of Organellar Genomes with High-Fidelity Data, ***Molecular Biology and Evolution***, Volume 42, Issue 1, January 2025, msae247,[https://doi.org/10.1093/molbev/msae247](https://doi.org/10.1093/molbev/msae247)
 
 ### Please cite the dependencies if you use TIPPo:
 Flye: https://www.nature.com/articles/s41587-019-0072-8   
