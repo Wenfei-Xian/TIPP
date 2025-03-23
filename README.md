@@ -73,7 +73,6 @@ conda install -c conda-forge r-igraph (TIPP_telomere)
 conda install -c bioconda bioconductor-biostrings (TIPP_telomere)
 conda install -c r r-stringdist (TIPP_telomere)
 conda install -c conda-forge r-ggplot2 (TIPP_telomere)
-conda install -c bioconda trf (TIPP_telomere)   
 
 git clone https://github.com/Wenfei-Xian/TIPP.git
 cd TIPP
