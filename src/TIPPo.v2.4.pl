@@ -27,6 +27,7 @@ my$trf;
 #v2.2: Nov 11, 2024; accept the file with the absoult path, reconstructe the repeat graph with smaller overlap length;
 #v2.3: Dec 03, 2024; intergrated the reference based approach 
 #v2.4: Dec 04, 2024; excluded the tandem repeats reads (HiFi only)
+#v2.4.1: Mar 23, 2025; a bug fixed
 my$show_version = 0;
 
 GetOptions(
@@ -370,8 +371,9 @@ if( $organelle eq 'organelle' ){
 	if( defined $reference ){
 		if( $platform eq 'hifi' || $platform eq 'onthq' ){
 			system("mkdir $fastq_name.$organelle/$fastq_name.mitochondrial.fasta.tmp");
-			system("kmc -t$threads -k31 -cs999999 -ci2 -fa $fastq_name.$organelle/$fastq_name.mitochondrial.fasta $fastq_name.$organelle/$fastq_name.mitochondrial.fasta $fastq_name.$organelle/$fastq_name_reads.mitochondrial.fasta.tmp");
-			system("rm -rf $fastq_name.$organelle/$fastq_name.mitochondrial.fasta.tmp");
+			#system("kmc -t$threads -k31 -cs999999 -ci2 -fa $fastq_name.$organelle/$fastq_name.mitochondrial.fasta $fastq_name.$organelle/$fastq_name.mitochondrial.fasta $fastq_name.$organelle/$fastq_name_reads.mitochondrial.fasta.tmp");
+			system("kmc -t$threads -k31 -cs999999 -ci2 -fa $fastq_name.$organelle/$fastq_name.mitochondrial.fasta $fastq_name.$organelle/$fastq_name.mitochondrial.fasta $fastq_name.$organelle/$fastq_name.mitochondrial.fasta.tmp"); # v2.4.1
+   			system("rm -rf $fastq_name.$organelle/$fastq_name.mitochondrial.fasta.tmp");
 			system("$script_dir/readskmercount $fastq_name.$organelle/$fastq_name.mitochondrial.fasta $fastq_name.$organelle/$fastq_name.mitochondrial.fasta $threads $lkc $hkc");
 		}
 		else{
