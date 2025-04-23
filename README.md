@@ -52,7 +52,7 @@ Minimap2 https://github.com/lh3/minimap2
 ## Via Conda [![install with bioconda](https://img.shields.io/badge/install%20with-bioconda-brightgreen.svg?style=flat)](https://anaconda.org/bioconda/tipp)
 
 ```
-conda create -n TIPP
+conda create -n TIPP python=3.8 #please specific the python version to 3.8 :)
 conda activate TIPP
 conda install bioconda::tipp
 ```
