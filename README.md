@@ -204,9 +204,9 @@ If you are interested in exploring the **complexity of the mitochondrial genome*
 ```
 your_input_file.mitochondrial.fasta.filter.fasta.flye/50.repeat-graph/graph_before_rr.gfa
 ```
-### Linearize your GFA to FASTA
+### GFA → Linearized FASTA
+#### Detects circular paths in a GFA assembly graph and outputs a linearized FASTA sequence starting at the longest segment.
 ```
-
 ```
 
 
