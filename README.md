@@ -59,7 +59,7 @@ conda install bioconda::tipp
 ## Manual
 
 ```
-conda create -n TIPP python=3.7
+conda create -n TIPP python=3.8
 conda activate TIPP
 pip install tiara (TIPPo)
 conda install bioconda::graphaligner (TIPPo)
