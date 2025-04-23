@@ -160,20 +160,21 @@ By default, apptainer mounts your home and the current working directory inside 
 ## Usage   
 ### TIPPo-usage   
 ```
-Usage: /tmp/global2/wxian/software/TIPP/src/TIPPo.v2.3.pl [options]
+TIPPo.v2.4.pl 
+Usage: /tmp/global2/wxian/conda/envs/tipp13/bin/TIPPo.v2.4.pl [options]
   -h: Show this help message.
-  -f: HiFi reads (required).
+  -f: Long reads (required).
+  -d: reference sequence (default: None).
   -g: chloroplast or organelle (default: organelle).
   -t: Threads for tiara, flye, KMC3 and readskmercount.
   -n: Number of reads in each downsample for chloroplast.
   -r: Number of random downsamplings (default: 5).
-  -i: Assume the presence of the inverted repeats (default: 1).
+  -p: Sequence technology - 'hifi','clr','ont', 'onthq' (default: hifi)
+  -i: Assume the presence of the inverted repeats in the chloroplast genome (default: 1).
   -l: lower kmer count - lkc (default: 0.3).
   -c: high kmer count - hkc (default: 5).
-  -y: parameter for flye (default: --pacbio-hifi).
-  -a: parameter for minimap2 (default: map-hifi).
   -m: minimum overlap in repeat graph construction (default:800)
-  -b: reference sequence (default: No).
+  --trf: remove the reads are tandem repeats, only avaliable for reference-free and hifi/onthq reads
   -v: version.
 ```
 ### TIPP_telomere   
@@ -203,6 +204,11 @@ If you are interested in exploring the **complexity of the mitochondrial genome*
 ```
 your_input_file.mitochondrial.fasta.filter.fasta.flye/50.repeat-graph/graph_before_rr.gfa
 ```
+### Linearize your GFA to FASTA
+```
+
+```
+
 
 ## Errors I met
 
