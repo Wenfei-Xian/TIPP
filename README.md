@@ -207,7 +207,8 @@ your_input_file.mitochondrial.fasta.filter.fasta.flye/50.repeat-graph/graph_befo
 ### GFA → Linearized FASTA
 #### Detects circular paths in a GFA assembly graph and outputs a linearized FASTA sequence starting at the longest segment.
 ```
-
+#“The script first groups edges into clusters based on the L-links (connected components). For each cluster, it checks whether the graph contains a cycle. If it does, it finds that cycle and then linearizes it by ‘cutting’ the circle open at the start of the longest segment.”
+python3 script/gfa2fasta-cycle.py example/
 ```
 
 
